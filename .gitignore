@@ -1,0 +1,24 @@
+# Local credentials and cluster access
+.env
+.env.*
+!.env.example
+*.kubeconfig
+.kube/
+secrets/
+*.pem
+*.key
+
+# Raw evidence may contain hostnames, tokens, or workload data
+evidence/raw/
+*.log
+
+# Large local artifacts
+*.tar
+*.tar.gz
+*.oci.tar
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
