@@ -1,0 +1,6 @@
+# Air-gapped mode for docker.io: use only the lab registry, with no upstream fallback.
+server = "https://192.168.88.3:5000"
+
+[host."https://192.168.88.3:5000"]
+  capabilities = ["pull", "resolve"]
+  ca = "/etc/containerd/certs.d/docker.io/ca.crt"

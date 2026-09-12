@@ -1,0 +1,11 @@
+NAME                              READY   STATUS    RESTARTS       AGE   IP            NODE          NOMINATED NODE   READINESS GATES
+carts-7b9ddb84db-2dwdb            1/1     Running   18 (17h ago)   23h   10.244.2.41   k8s-worker2   <none>           <none>
+carts-dynamodb-56567f6bd8-6wzg8   1/1     Running   1 (18h ago)    23h   10.244.1.48   k8s-worker1   <none>           <none>
+catalog-9c4b9dcf4-xb2tp           1/1     Running   16 (17h ago)   23h   10.244.1.52   k8s-worker1   <none>           <none>
+catalog-mysql-0                   1/1     Running   1 (18h ago)    23h   10.244.1.50   k8s-worker1   <none>           <none>
+checkout-54fb84db9f-g728c         1/1     Running   1 (18h ago)    23h   10.244.2.40   k8s-worker2   <none>           <none>
+checkout-redis-74cb47bfd6-2ml4t   1/1     Running   1 (18h ago)    23h   10.244.1.49   k8s-worker1   <none>           <none>
+orders-5b466fdc4c-bjqjf           1/1     Running   1 (18h ago)    23h   10.244.1.53   k8s-worker1   <none>           <none>
+orders-postgresql-0               1/1     Running   1 (18h ago)    23h   10.244.2.37   k8s-worker2   <none>           <none>
+orders-rabbitmq-0                 1/1     Running   1 (18h ago)    23h   10.244.2.38   k8s-worker2   <none>           <none>
+ui-699d9bd74f-fmqz6               1/1     Running   1 (18h ago)    23h   10.244.1.51   k8s-worker1   <none>           <none>

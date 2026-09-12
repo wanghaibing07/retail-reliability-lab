@@ -1,0 +1,6 @@
+# Air-gapped mode: resolve configured image references only from the lab registry.
+server = "https://192.168.88.3:5000"
+
+[host."https://192.168.88.3:5000"]
+  capabilities = ["pull", "resolve"]
+  ca = "/etc/containerd/certs.d/_default/ca.crt"

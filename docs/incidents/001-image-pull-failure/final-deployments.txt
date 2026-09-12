@@ -1,0 +1,8 @@
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+carts            1/1     1            1           23h
+carts-dynamodb   1/1     1            1           23h
+catalog          1/1     1            1           23h
+checkout         1/1     1            1           23h
+checkout-redis   1/1     1            1           23h
+orders           1/1     1            1           23h
+ui               1/1     1            1           23h
