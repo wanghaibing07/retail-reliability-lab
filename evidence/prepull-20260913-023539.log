@@ -1,0 +1,22 @@
+=== Retail image pre-pull ===
+Manifest: /root/retail-reliability-lab/infra/vendor/retail-v1.6.2.yaml
+Started : 2026-09-13 02:35:39
+
+[INFO] Found 10 unique images:
+  - public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+  - public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+  - public.ecr.aws/docker/library/mysql:8.0
+  - public.ecr.aws/docker/library/postgres:16.1
+  - public.ecr.aws/docker/library/rabbitmq:3-management
+  - redis:6.0-alpine
+
+[INFO] Worker nodes:
+  - k8s-worker1
+  - k8s-worker2
+
+[CHECK] k8s-worker1: SSH + crictl
+Host key verification failed.

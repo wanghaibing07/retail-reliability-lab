@@ -1,0 +1,137 @@
+=== Retail image pre-pull ===
+Manifest: /root/retail-reliability-lab/infra/vendor/retail-v1.6.2.yaml
+Started : 2026-09-13 02:53:51
+
+[INFO] Found 10 unique images:
+  - public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+  - public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+  - public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+  - public.ecr.aws/docker/library/mysql:8.0
+  - public.ecr.aws/docker/library/postgres:16.1
+  - public.ecr.aws/docker/library/rabbitmq:3-management
+  - redis:6.0-alpine
+
+[INFO] Worker nodes:
+  - k8s-worker1
+  - k8s-worker2
+
+[CHECK] k8s-worker1: SSH + crictl
+[OK] k8s-worker1
+[CHECK] k8s-worker2: SSH + crictl
+[OK] k8s-worker2
+
+========================================
+[NODE] k8s-worker1
+========================================
+
+[1/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+Image is up to date for sha256:53aa00c74ea1725745411d5082ed2b132521acdaedf55f44d1b679e4c2d71f98
+[OK] k8s-worker1: public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+
+[2/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+Image is up to date for sha256:6f47a55fdf8382b6245cf39fbbfca9951583572bad88db9f4735bc29280b16cf
+[OK] k8s-worker1: public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+
+[3/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+Image is up to date for sha256:7c77c7dd5f6140f44720152a27b6e97e18426956368e68f71956a0a6c0732129
+[OK] k8s-worker1: public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+
+[4/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+Image is up to date for sha256:b1999c1d4973243e40957d0b08e842e240c6757309a19a2181b9508ea54260b3
+[OK] k8s-worker1: public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+
+[5/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+Image is up to date for sha256:e1a3dd871e821a4d251f6f8202db330a89fb40fc3ed4f4eab950ae7a5c5941d2
+[OK] k8s-worker1: public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+
+[6/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+Image is up to date for sha256:273dcf289b7917ed2d3c871a18c492b6ccc3ae10e8ff64c2defbeb0c81f01332
+[OK] k8s-worker1: public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+
+[7/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/docker/library/mysql:8.0
+Image is up to date for sha256:6cd09145362dfe6831b14545de3d5fd6cc75c37cfd6ef8561429c1fc73518b39
+[OK] k8s-worker1: public.ecr.aws/docker/library/mysql:8.0
+
+[8/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/docker/library/postgres:16.1
+Image is up to date for sha256:b0b90c1d9579032974dc7a3914392004b29e31c071524575b45ee9985f1c43ba
+[OK] k8s-worker1: public.ecr.aws/docker/library/postgres:16.1
+
+[9/20] Pulling on k8s-worker1
+[IMAGE] public.ecr.aws/docker/library/rabbitmq:3-management
+Image is up to date for sha256:de912cbbf07f938bb8aaa5682464a73a00c6a996efdf0880423aeb4eae006c34
+[OK] k8s-worker1: public.ecr.aws/docker/library/rabbitmq:3-management
+
+[10/20] Pulling on k8s-worker1
+[IMAGE] redis:6.0-alpine
+Image is up to date for sha256:19150f5e615e35503bf28b1e8f215ed641da1460a168f39038c754d07315d4c6
+[OK] k8s-worker1: redis:6.0-alpine
+========================================
+[NODE] k8s-worker2
+========================================
+
+[11/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+Image is up to date for sha256:53aa00c74ea1725745411d5082ed2b132521acdaedf55f44d1b679e4c2d71f98
+[OK] k8s-worker2: public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+
+[12/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+Image is up to date for sha256:6f47a55fdf8382b6245cf39fbbfca9951583572bad88db9f4735bc29280b16cf
+[OK] k8s-worker2: public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+
+[13/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+Image is up to date for sha256:7c77c7dd5f6140f44720152a27b6e97e18426956368e68f71956a0a6c0732129
+[OK] k8s-worker2: public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+
+[14/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+Image is up to date for sha256:b1999c1d4973243e40957d0b08e842e240c6757309a19a2181b9508ea54260b3
+[OK] k8s-worker2: public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+
+[15/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+Image is up to date for sha256:e1a3dd871e821a4d251f6f8202db330a89fb40fc3ed4f4eab950ae7a5c5941d2
+[OK] k8s-worker2: public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+
+[16/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+Image is up to date for sha256:273dcf289b7917ed2d3c871a18c492b6ccc3ae10e8ff64c2defbeb0c81f01332
+[OK] k8s-worker2: public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+
+[17/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/docker/library/mysql:8.0
+Image is up to date for sha256:6cd09145362dfe6831b14545de3d5fd6cc75c37cfd6ef8561429c1fc73518b39
+[OK] k8s-worker2: public.ecr.aws/docker/library/mysql:8.0
+
+[18/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/docker/library/postgres:16.1
+Image is up to date for sha256:b0b90c1d9579032974dc7a3914392004b29e31c071524575b45ee9985f1c43ba
+[OK] k8s-worker2: public.ecr.aws/docker/library/postgres:16.1
+
+[19/20] Pulling on k8s-worker2
+[IMAGE] public.ecr.aws/docker/library/rabbitmq:3-management
+Image is up to date for sha256:de912cbbf07f938bb8aaa5682464a73a00c6a996efdf0880423aeb4eae006c34
+[OK] k8s-worker2: public.ecr.aws/docker/library/rabbitmq:3-management
+
+[20/20] Pulling on k8s-worker2
+[IMAGE] redis:6.0-alpine
+Image is up to date for sha256:19150f5e615e35503bf28b1e8f215ed641da1460a168f39038c754d07315d4c6
+[OK] k8s-worker2: redis:6.0-alpine
+
+========================================
+[PASS] All images are available on all workers
+Finished: 2026-09-13 02:54:11
+Log: /root/retail-reliability-lab/evidence/prepull-20260913-025351.log
+========================================
