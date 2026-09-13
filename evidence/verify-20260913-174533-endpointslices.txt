@@ -1,0 +1,11 @@
+NAME                      ADDRESSTYPE   PORTS        ENDPOINTS     AGE
+carts-dynamodb-qjcmn      IPv4          8000         10.244.1.48   38h
+carts-g68wg               IPv4          8080         10.244.2.41   38h
+catalog-2jmfc             IPv4          8080         10.244.1.52   38h
+catalog-mysql-6hjhk       IPv4          3306         10.244.1.50   38h
+checkout-jpj5m            IPv4          8080         10.244.2.40   38h
+checkout-redis-r492p      IPv4          6379         10.244.1.49   38h
+orders-postgresql-4qxb7   IPv4          5432         10.244.2.37   38h
+orders-rabbitmq-8mnnk     IPv4          15672,5672   10.244.2.38   38h
+orders-xrm4z              IPv4          8080         10.244.1.53   38h
+ui-qs4jm                  IPv4          8080         10.244.1.51   38h

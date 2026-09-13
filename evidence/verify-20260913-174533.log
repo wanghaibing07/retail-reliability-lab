@@ -1,0 +1,75 @@
+=== Retail deployment verification ===
+Namespace: retail
+Started  : 2026-09-13 17:45:33
+
+[PASS] Kubernetes API and namespace are reachable
+
+=== Layer 1: Workloads ===
+[CHECK] deployment.apps/carts
+deployment "carts" successfully rolled out
+[PASS] deployment.apps/carts
+[CHECK] deployment.apps/carts-dynamodb
+deployment "carts-dynamodb" successfully rolled out
+[PASS] deployment.apps/carts-dynamodb
+[CHECK] deployment.apps/catalog
+deployment "catalog" successfully rolled out
+[PASS] deployment.apps/catalog
+[CHECK] deployment.apps/checkout
+deployment "checkout" successfully rolled out
+[PASS] deployment.apps/checkout
+[CHECK] deployment.apps/checkout-redis
+deployment "checkout-redis" successfully rolled out
+[PASS] deployment.apps/checkout-redis
+[CHECK] deployment.apps/orders
+deployment "orders" successfully rolled out
+[PASS] deployment.apps/orders
+[CHECK] deployment.apps/ui
+deployment "ui" successfully rolled out
+[PASS] deployment.apps/ui
+[CHECK] statefulset.apps/catalog-mysql
+partitioned roll out complete: 1 new pods have been updated...
+[PASS] statefulset.apps/catalog-mysql
+[CHECK] statefulset.apps/orders-postgresql
+partitioned roll out complete: 1 new pods have been updated...
+[PASS] statefulset.apps/orders-postgresql
+[CHECK] statefulset.apps/orders-rabbitmq
+partitioned roll out complete: 1 new pods have been updated...
+[PASS] statefulset.apps/orders-rabbitmq
+
+[CHECK] All Pods Ready
+pod/carts-7b9ddb84db-2dwdb condition met
+pod/carts-dynamodb-56567f6bd8-6wzg8 condition met
+pod/catalog-9c4b9dcf4-xb2tp condition met
+pod/catalog-mysql-0 condition met
+pod/checkout-54fb84db9f-g728c condition met
+pod/checkout-redis-74cb47bfd6-2ml4t condition met
+pod/orders-5b466fdc4c-bjqjf condition met
+pod/orders-postgresql-0 condition met
+pod/orders-rabbitmq-0 condition met
+pod/ui-699d9bd74f-fmqz6 condition met
+[PASS] All Pods are Ready
+
+=== Layer 2: Services ===
+[OK] carts: 10.244.2.41 
+[OK] carts-dynamodb: 10.244.1.48 
+[OK] catalog: 10.244.1.52 
+[OK] catalog-mysql: 10.244.1.50 
+[OK] checkout: 10.244.2.40 
+[OK] checkout-redis: 10.244.1.49 
+[OK] orders: 10.244.1.53 
+[OK] orders-postgresql: 10.244.2.37 
+[OK] orders-rabbitmq: 10.244.2.38 
+[OK] ui: 10.244.1.51 
+[PASS] All selected Services have Ready Endpoints
+
+=== Layer 3: Business HTTP ===
+[CHECK] http://192.168.88.3:31559/
+[PASS] Business HTTP check returned 200
+
+=== Evidence ===
+
+========================================
+[PASS] Retail application verification succeeded
+Finished: 2026-09-13 17:45:40
+Log     : /root/retail-reliability-lab/evidence/verify-20260913-174533.log
+========================================
