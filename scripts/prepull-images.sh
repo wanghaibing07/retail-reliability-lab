@@ -102,7 +102,9 @@ for node in "${NODES[@]}"; do
         echo
         echo "[${CURRENT}/${TOTAL}] Pulling on ${node}"
         echo "[IMAGE] ${image}"
-
+        # Image reference intentionally expands on the client side
+        # from the version-locked manifest.
+        # shellcheck disable=SC2029
         if ssh "${SSH_USER}@${node}" crictl pull "${image}"; then
             echo "[OK] ${node}: ${image}"
         else
