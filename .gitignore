@@ -3,3 +3,6 @@
 evidence/verify-*-pods.txt
 evidence/verify-*-services.txt
 evidence/verify-*-endpointslices.txt
+
+# Runtime logs
+*.log
