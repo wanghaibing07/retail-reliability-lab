@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Check Bash syntax
+        run: |
+          for file in scripts/*.sh; do
+            echo "Checking ${file}"
+            bash -n "${file}"
+          done
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        run: shellcheck scripts/*.sh
+
+      - name: Install kubeconform
+        run: |
+          curl -L \
+            https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz \
+            -o /tmp/kubeconform.tar.gz
+
+          tar -xzf /tmp/kubeconform.tar.gz -C /tmp
+          sudo install -m 0755 /tmp/kubeconform /usr/local/bin/kubeconform
+
+      - name: Validate Kubernetes manifest
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            infra/vendor/retail-v1.6.2.yaml
+
+      - name: Reject latest image tags
+        run: |
+          if grep -E '^[[:space:]]*image:.*:latest' \
+            infra/vendor/retail-v1.6.2.yaml; then
+            echo "[FAIL] latest image tag detected"
+            exit 1
+          fi
+
+          echo "[PASS] No latest image tags"
