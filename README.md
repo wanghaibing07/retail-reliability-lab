@@ -17,7 +17,7 @@
 | Stage 0 | Baseline + Incident #001 | ✅ 完成 |
 | Stage 1 | Reproducible Deploy | ✅ 完成 |
 | Stage 2 | CI Validation | ✅ 完成 |
-| Stage 3 | Argo CD / GitOps | 🚧 下一阶段 |
+| Stage 3 | Argo CD / GitOps | 🚧 进行中 |
 | Stage 4 | Observability | ⏳ Planned |
 | Stage 5 | Backup / Restore | ⏳ Planned |
 | Stage 6 | Release Failure & Recovery | ⏳ Planned |
@@ -169,9 +169,9 @@ retail-reliability-lab/
 └── README.md
 ```
 
-## 下一阶段：GitOps
+## 当前阶段：GitOps
 
-下一阶段将引入 Argo CD，使 Git 成为 Kubernetes 集群的期望状态来源。
+Argo CD 已安装并运行，后续将验证 Git 作为 Kubernetes 集群期望状态源，并完成 Application 管理、Manual Sync、Auto Sync 和 Self Heal。
 
 计划验证：
 
