@@ -5,3 +5,6 @@ namespace: retail
 
 resources:
   - ../../vendor
+
+patches:
+  - path: patches/ui-replicas.yaml
