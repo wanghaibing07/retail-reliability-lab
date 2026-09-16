@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: retail
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/wanghaibing07/retail-reliability-lab.git
+    targetRevision: main
+    path: infra/apps/retail
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: retail
