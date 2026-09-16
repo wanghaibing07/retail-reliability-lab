@@ -6,3 +6,6 @@ evidence/verify-*-endpointslices.txt
 
 # Runtime logs
 *.log
+
+# Generated closeout evidence
+evidence/closeout-*/

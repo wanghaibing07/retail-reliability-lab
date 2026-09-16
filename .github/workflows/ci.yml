@@ -27,6 +27,24 @@ jobs:
       - name: Run ShellCheck
         run: shellcheck scripts/*.sh
 
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/v1.28.2/bin/linux/amd64/kubectl"
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+      - name: Render Kustomize manifests
+        run: |
+          kubectl kustomize infra/apps/retail \
+            > /tmp/retail-rendered.yaml
+
+          test -s /tmp/retail-rendered.yaml
+
+          echo "Rendered resources:"
+          grep '^kind:' /tmp/retail-rendered.yaml \
+            | sort \
+            | uniq -c
+
       - name: Install kubeconform
         run: |
           curl -L \
@@ -36,17 +54,18 @@ jobs:
           tar -xzf /tmp/kubeconform.tar.gz -C /tmp
           sudo install -m 0755 /tmp/kubeconform /usr/local/bin/kubeconform
 
-      - name: Validate Kubernetes manifest
+      - name: Validate rendered Kubernetes manifests
         run: |
           kubeconform \
             -strict \
             -summary \
-            infra/vendor/retail-v1.6.2.yaml
+            -kubernetes-version 1.28.0 \
+            /tmp/retail-rendered.yaml
 
       - name: Reject latest image tags
         run: |
-          if grep -E '^[[:space:]]*image:.*:latest' \
-            infra/vendor/retail-v1.6.2.yaml; then
+          if grep -E '^[[:space:]]*image:.*:latest([[:space:]]|$)' \
+            /tmp/retail-rendered.yaml; then
             echo "[FAIL] latest image tag detected"
             exit 1
           fi
