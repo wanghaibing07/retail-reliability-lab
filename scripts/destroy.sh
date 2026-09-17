@@ -6,7 +6,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NAMESPACE="retail"
 ARGO_NAMESPACE="argocd"
 APPLICATION="retail"
-KUSTOMIZE_DIR="${ROOT_DIR}/infra/apps/retail"
 TIMEOUT="${TIMEOUT:-180s}"
 
 DRY_RUN=false
