@@ -12,7 +12,7 @@ This directory contains evidence-based incident reviews produced during the Reta
 
 Incident reviews record:
 
-`
+~~~text
 what happened
 → impact
 → evidence
@@ -21,12 +21,12 @@ what happened
 → validation
 → lessons
 → measurable follow-up
-`
+~~~
 
 Runbooks are maintained separately because they answer a different question:
 
-`
+~~~text
 How should the next operator diagnose or recover this class of failure?
-`
+~~~
 
 Design decisions are also kept separately from incidents.

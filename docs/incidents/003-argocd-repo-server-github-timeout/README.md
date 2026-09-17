@@ -2,7 +2,7 @@
 
 ## Status
 
-**Partially mitigated — GitOps comparison recovered; underlying virtual-network fault remains reproducible**
+**Partially mitigated — control-plane comparison recovered; underlying guest-egress fault remains unresolved**
 
 Argo CD currently has a retry mitigation in place:
 
@@ -354,7 +354,7 @@ OutOfSync
 
 This transition is considered recovery of the repository-comparison path.
 
-The later UI replica deployment belongs to the planned GitOps Manual Sync workflow and is not part of the network-incident recovery itself.
+The later UI replica deployment was completed through the planned GitOps Manual Sync workflow: the UI reached `2/2`, Argo CD reached `Synced/Healthy`, and `verify.sh` plus the business HTTP check passed. This is release validation, not evidence that the underlying guest-egress fault was fixed.
 
 ## Validation
 
@@ -389,19 +389,21 @@ ARGOCD_GIT_ATTEMPTS_COUNT=3
 
 from an imperative live-cluster change into repository-managed Argo CD configuration.
 
-### P0 — Complete the pending GitOps deployment
+### P0 — Preserve the recovered control-plane state
 
-Perform the planned Manual Sync for the UI replica change and validate:
+The planned UI replica change was completed through the normal GitOps Manual Sync
+workflow and validated as:
 
 ```text
 UI Deployment 2/2
-Argo Synced
-Argo Healthy
+Argo Synced/Healthy
 verify.sh PASS
 HTTP 200
 ```
 
-This is a normal release action and should remain separate from Incident #003.
+This closes the release action, but it does not close the network incident. The
+repo-server retry remains a mitigation, and the underlying VMware guest-egress
+fault still requires a separate infrastructure investigation.
 
 ### P1 — Monitor Argo repository access
 

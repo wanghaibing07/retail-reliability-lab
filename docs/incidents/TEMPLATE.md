@@ -32,12 +32,12 @@ Describe experiments and why they were performed.
 
 Separate:
 
-`
+~~~text
 Confirmed
 Strongly supported
 Possible
 Not proven
-`
+~~~
 
 ## Contributing Factors
 

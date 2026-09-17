@@ -17,7 +17,7 @@
 | Stage 0 | Baseline + Incident #001 | ✅ 完成 |
 | Stage 1 | Reproducible Deploy | ✅ 完成 |
 | Stage 2 | CI Validation | ✅ 完成 |
-| Stage 3 | Argo CD / GitOps | 🚧 进行中 |
+| Stage 3 | Argo CD / GitOps | ✅ 手动 GitOps 已跑通 |
 | Stage 4 | Observability | ⏳ Planned |
 | Stage 5 | Backup / Restore | ⏳ Planned |
 | Stage 6 | Release Failure & Recovery | ⏳ Planned |
@@ -173,24 +173,29 @@ retail-reliability-lab/
 │   └── destroy.sh
 └── README.md
 ```
+
 ## 当前阶段：GitOps
 
-当前 Stage 3 已完成：
+当前 Stage 3 的手动 GitOps 链路已跑通：
 
 - Kustomize desired-state 入口：`infra/apps/retail`
 - GitHub Actions 对 rendered manifests 做 CI 校验
 - Argo CD declarative Application
 - 已有业务资源的安全接管
-- 独立 Argo resource tracking label
+- Argo CD annotation-based resource tracking（现场 33/33 个资源有 `argocd.argoproj.io/tracking-id`）
 - `Git PR → CI → Merge → OutOfSync → Manual Sync` 链路
 - PR #6 将 UI 从 1 副本扩为 2 副本，并完成 `2/2` 发布验证
+- PR #7 将 UI Service 从旧的 LoadBalancer 切换为 NodePort，完成健康状态修复
 - Incident #003 repo-server 到 GitHub 超时的受控排障
+
+健康状态的历史因果已记录：旧 UI Service 使用 LoadBalancer 且没有
+`status.loadBalancer.ingress` 时，Argo CD 曾显示 `Progressing`；PR #7 切换为
+NodePort 后，当前 Application 已恢复为 `Synced/Healthy`。
 
 当前保留的工程收口项：
 
-- Argo Application 当前为 `Synced`，但 health 仍为 `Progressing`；需要单独解释并关闭
 - `deploy/prepull` 与 Argo 需要统一到 `infra/apps/retail`
-- tracking label 与 repo-server retry 需要声明化管理
+- Argo CD 平台配置与 repo-server retry 需要声明化管理
 - Auto Sync、Self Heal、Prune 尚待独立验证
 
 详细设计与实验记录：
@@ -201,7 +206,6 @@ retail-reliability-lab/
 - [Decisions](docs/decisions/)
 
 ## 项目边界
-
 
 这是本地 Kubernetes 实验环境，不宣称为生产级高可用架构。
 

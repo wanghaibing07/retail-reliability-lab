@@ -8,9 +8,9 @@ Make Git the source of desired Kubernetes application state while keeping delive
 
 The Retail desired state used by CI and Argo CD is:
 
-`
+~~~text
 infra/apps/retail
-`
+~~~
 
 Kustomize composes the fixed upstream manifest in infra/vendor/ with project patches.
 
@@ -18,13 +18,13 @@ Kustomize composes the fixed upstream manifest in infra/vendor/ with project pat
 
 Pull requests and pushes validate:
 
-`
+~~~text
 Bash syntax
 → ShellCheck
 → kubectl kustomize
 → kubeconform on rendered output
 → reject :latest
-`
+~~~
 
 CI validates rendered desired state rather than only the raw vendor manifest.
 
@@ -43,7 +43,11 @@ The Application was initially operated with Manual Sync so that Git observation 
 
 ## Resource Adoption
 
-The initial adoption preserved the upstream business labels. Argo ownership uses argocd.argoproj.io/instance; the decision is recorded in [ADR 001](../decisions/001-argocd-resource-tracking.md).
+The initial adoption preserved the upstream business labels. The live resource audit
+found annotation-based Argo tracking: 33/33 observed resources carried
+`argocd.argoproj.io/tracking-id`, while 0/33 carried the previously documented
+`argocd.argoproj.io/instance` tracking label. The decision is recorded in
+[ADR 001](../decisions/001-argocd-resource-tracking.md).
 
 ## First GitOps Change
 
@@ -51,7 +55,7 @@ PR #6 changed the UI replica count from 1 to 2 through a Kustomize patch. The PR
 
 The resulting release sequence was:
 
-`
+~~~text
 Git change
 → Pull request
 → CI pass
@@ -59,11 +63,19 @@ Git change
 → Argo detects OutOfSync
 → Manual Sync
 → UI 2/2
-`
+~~~
 
 The before/after snapshots are kept in [the Manual Sync evidence](../../evidence/gitops-first-manual-sync/after.txt).
 
-The live Application is now Synced; its health field remains Progressing in the current cluster snapshot even though all Retail workloads, endpoints and the business HTTP check passed. This is recorded as a known Argo health-status follow-up rather than being silently reported as Healthy.
+## Health Status Correction
+
+The old UI Service used `LoadBalancer` without a populated
+`status.loadBalancer.ingress`, so Argo CD previously reported `Progressing` even
+after the workload itself was available. PR #7 changed the UI Service to
+`NodePort`; after that change the Application reached `Synced/Healthy`.
+
+This records the historical `Progressing` state and its fix rather than treating
+it as the current health state.
 
 ## Verification
 
@@ -80,13 +92,12 @@ During this experiment Argo CD repo-server intermittently failed Git requests to
 
 ## Remaining Stage 3 Work
 
-`
-1. Explain and close the remaining Argo Application health state
-2. Remove multiple desired-state entry points
-3. Declaratively manage Argo platform configuration
-4. Enable and test Auto Sync with prune disabled
-5. Enable and test Self Heal
-6. Test prune separately with an explicit safety policy
-`
+~~~text
+1. Remove multiple desired-state entry points
+2. Declaratively manage Argo platform configuration
+3. Enable and test Auto Sync with prune disabled
+4. Enable and test Self Heal
+5. Test prune separately with an explicit safety policy
+~~~
 
 Auto Sync, self-heal and prune remain separate capabilities. They are not claimed as completed by the Manual Sync evidence.
