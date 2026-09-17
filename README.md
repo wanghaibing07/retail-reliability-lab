@@ -156,11 +156,16 @@ retail-reliability-lab/
 │   └── workflows/
 │       └── ci.yml
 ├── docs/
-│   └── incidents/
+│   ├── incidents/
+│   ├── runbooks/
+│   ├── decisions/
+│   └── gitops/
 ├── evidence/
 ├── infra/
-│   └── vendor/
-│       └── retail-v1.6.2.yaml
+│   ├── vendor/
+│   ├── apps/
+│   │   └── retail/
+│   └── argocd/
 ├── scripts/
 │   ├── prepull-images.sh
 │   ├── deploy.sh
@@ -168,44 +173,35 @@ retail-reliability-lab/
 │   └── destroy.sh
 └── README.md
 ```
-
 ## 当前阶段：GitOps
 
-Argo CD 已安装并运行，后续将验证 Git 作为 Kubernetes 集群期望状态源，并完成 Application 管理、Manual Sync、Auto Sync 和 Self Heal。
+当前 Stage 3 已完成：
 
-计划验证：
+- Kustomize desired-state 入口：`infra/apps/retail`
+- GitHub Actions 对 rendered manifests 做 CI 校验
+- Argo CD declarative Application
+- 已有业务资源的安全接管
+- 独立 Argo resource tracking label
+- `Git PR → CI → Merge → OutOfSync → Manual Sync` 链路
+- PR #6 将 UI 从 1 副本扩为 2 副本，并完成 `2/2` 发布验证
+- Incident #003 repo-server 到 GitHub 超时的受控排障
 
-```text
-Git Change
-    ↓
-Pull Request
-    ↓
-CI
-    ↓
-Merge
-    ↓
-Argo CD Sync
-    ↓
-Kubernetes
-    ↓
-verify.sh
-```
+当前保留的工程收口项：
 
-同时进行 Configuration Drift 实验：
+- Argo Application 当前为 `Synced`，但 health 仍为 `Progressing`；需要单独解释并关闭
+- `deploy/prepull` 与 Argo 需要统一到 `infra/apps/retail`
+- tracking label 与 repo-server retry 需要声明化管理
+- Auto Sync、Self Heal、Prune 尚待独立验证
 
-```text
-Git Desired State
-      ↓
-手工修改 Kubernetes
-      ↓
-产生 Drift
-      ↓
-Argo CD 检测
-      ↓
-Self Heal
-```
+详细设计与实验记录：
+
+- [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
+- [Incidents](docs/incidents/)
+- [Runbooks](docs/runbooks/)
+- [Decisions](docs/decisions/)
 
 ## 项目边界
+
 
 这是本地 Kubernetes 实验环境，不宣称为生产级高可用架构。
 
