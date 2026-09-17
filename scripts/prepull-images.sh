@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MANIFEST="${MANIFEST:-${ROOT_DIR}/infra/vendor/retail-v1.6.2.yaml}"
+KUSTOMIZE_DIR="${KUSTOMIZE_DIR:-${ROOT_DIR}/infra/apps/retail}"
 SSH_USER="${SSH_USER:-root}"
 
 EVIDENCE_DIR="${ROOT_DIR}/evidence"
@@ -12,7 +12,7 @@ LOG_FILE="${EVIDENCE_DIR}/prepull-$(date '+%Y%m%d-%H%M%S').log"
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
 echo "=== Retail image pre-pull ==="
-echo "Manifest: ${MANIFEST}"
+echo "Kustomize: ${KUSTOMIZE_DIR}"
 echo "Started : $(date '+%F %T')"
 echo
 
@@ -28,8 +28,21 @@ command -v ssh >/dev/null 2>&1 || {
     exit 1
 }
 
-[[ -f "${MANIFEST}" ]] || {
-    echo "[FAIL] Manifest not found: ${MANIFEST}"
+[[ -f "${KUSTOMIZE_DIR}/kustomization.yaml" ]] || {
+    echo "[FAIL] Kustomization not found: ${KUSTOMIZE_DIR}"
+    exit 1
+}
+
+RENDERED_MANIFEST="$(mktemp)"
+trap 'rm -f "${RENDERED_MANIFEST}"' EXIT
+
+if ! kubectl kustomize "${KUSTOMIZE_DIR}" > "${RENDERED_MANIFEST}"; then
+    echo "[FAIL] Unable to render Kustomize desired state"
+    exit 1
+fi
+
+[[ -s "${RENDERED_MANIFEST}" ]] || {
+    echo "[FAIL] Rendered manifest is empty"
     exit 1
 }
 
@@ -37,12 +50,12 @@ command -v ssh >/dev/null 2>&1 || {
 
 mapfile -t IMAGES < <(
     awk '
-    /^[[:space:]]*image:/ {
-        sub(/^[[:space:]]*image:[[:space:]]*/, "", $0)
+    /^[[:space:]]*(-[[:space:]]*)?image:/ {
+        sub(/^[[:space:]]*(-[[:space:]]*)?image:[[:space:]]*/, "", $0)
         gsub(/^"|"$/, "", $0)
         print
     }
-    ' "${MANIFEST}" | sort -u
+    ' "${RENDERED_MANIFEST}" | sort -u
 )
 
 if [[ ${#IMAGES[@]} -eq 0 ]]; then
