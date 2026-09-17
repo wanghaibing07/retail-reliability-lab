@@ -1,0 +1,9 @@
+=== BEFORE MANUAL SYNC ===
+time=2026-09-17T16:24:31+08:00
+git=23f582e544b831f4ef663cf694e1feb8489950a9
+
+NAME     SYNC STATUS   HEALTH STATUS
+retail   OutOfSync     Progressing
+
+argo_revision=23f582e544b831f4ef663cf694e1feb8489950a9
+spec_replicas=1 ready=1 available=1

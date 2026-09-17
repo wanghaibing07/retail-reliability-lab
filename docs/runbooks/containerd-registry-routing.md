@@ -1,5 +1,10 @@
 # containerd Registry Routing
 
+## Scope
+
+本文件记录本实验室对 containerd Registry 路由和镜像恢复路径的验证结果。
+它不是生产级高可用 Registry 设计：当前方案的单副本、节点本地存储和实验网段边界必须在生产环境重新设计。
+本次项目收口只补充文档和证据，不在此 PR 中修改 containerd、CNI、Windows NAT 或业务 Deployment 的运行时配置。
 ## Problem
 
 安装 Argo CD 时出现 ImagePullBackOff。

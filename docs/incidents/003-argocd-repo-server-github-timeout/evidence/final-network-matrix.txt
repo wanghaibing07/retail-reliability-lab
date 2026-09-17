@@ -1,0 +1,31 @@
+Controlled test window:
+2026-09-17 07:41:43–07:45:18 UTC
+
+Target:
+https://github.com/wanghaibing07/retail-reliability-lab.git/info/refs?service=git-upload-pack
+
+Windows host:
+PASS 30/30
+FAIL 0/30
+HTTP 200
+total ~= 0.54–1.38s
+
+worker1 VMware guest:
+PASS 0/30
+FAIL 30/30
+main failure: curl rc=28
+HTTP code=000
+TCP connect timeout ~= 5s
+
+worker2 VMware guest:
+PASS 1/30
+FAIL 29/30
+main failure: TCP connect timeout
+one failed request completed TLS but received no HTTP first byte before timeout
+
+Interpretation:
+The same GitHub endpoint remained healthy from the Windows host while
+both VMware guests failed almost continuously.
+
+This strongly implicates the shared VMware guest outbound NAT/virtual-network
+path. The exact VMware/Windows networking component is not proven.

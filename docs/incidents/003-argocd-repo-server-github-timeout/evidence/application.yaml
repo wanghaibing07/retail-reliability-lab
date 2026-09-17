@@ -1,0 +1,581 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"name":"retail","namespace":"argocd"},"spec":{"destination":{"namespace":"retail","server":"https://kubernetes.default.svc"},"project":"default","source":{"path":"infra/apps/retail","repoURL":"https://github.com/wanghaibing07/retail-reliability-lab.git","targetRevision":"main"}}}
+  creationTimestamp: "2026-09-16T18:59:19Z"
+  generation: 73
+  name: retail
+  namespace: argocd
+  resourceVersion: "542099"
+  uid: 23bc6a98-0d84-4b77-8026-aa285eb22fa9
+spec:
+  destination:
+    namespace: retail
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: infra/apps/retail
+    repoURL: https://github.com/wanghaibing07/retail-reliability-lab.git
+    targetRevision: main
+status:
+  controllerNamespace: argocd
+  health:
+    lastTransitionTime: "2026-09-16T19:25:49Z"
+    status: Progressing
+  history:
+  - deployStartedAt: "2026-09-16T19:50:06Z"
+    deployedAt: "2026-09-16T19:50:08Z"
+    id: 0
+    initiatedBy:
+      username: admin
+    revision: 437b6ba97d31080ada64d086a0a5fa0f3d31ae25
+    source:
+      path: infra/apps/retail
+      repoURL: https://github.com/wanghaibing07/retail-reliability-lab.git
+      targetRevision: main
+  operationState:
+    finishedAt: "2026-09-16T19:50:08Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        revision: 437b6ba97d31080ada64d086a0a5fa0f3d31ae25
+        source:
+          path: infra/apps/retail
+          repoURL: https://github.com/wanghaibing07/retail-reliability-lab.git
+          targetRevision: main
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2026-09-16T19:50:06Z"
+    syncResult:
+      resources:
+      - group: ""
+        hookPhase: Running
+        kind: ServiceAccount
+        message: serviceaccount/ui configured
+        name: ui
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ServiceAccount
+        message: serviceaccount/orders configured
+        name: orders
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ServiceAccount
+        message: serviceaccount/catalog configured
+        name: catalog
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ServiceAccount
+        message: serviceaccount/carts configured
+        name: carts
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ServiceAccount
+        message: serviceaccount/checkout configured
+        name: checkout
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Secret
+        message: secret/orders-db configured
+        name: orders-db
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Secret
+        message: secret/catalog-db configured
+        name: catalog-db
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Secret
+        message: secret/orders-rabbitmq configured
+        name: orders-rabbitmq
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/orders configured
+        name: orders
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/ui configured
+        name: ui
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/checkout configured
+        name: checkout
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/carts configured
+        name: carts
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/catalog configured
+        name: catalog
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/carts configured
+        name: carts
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/orders-postgresql configured
+        name: orders-postgresql
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/catalog-mysql configured
+        name: catalog-mysql
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/carts-dynamodb configured
+        name: carts-dynamodb
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/catalog configured
+        name: catalog
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/orders configured
+        name: orders
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/orders-rabbitmq configured
+        name: orders-rabbitmq
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/ui configured
+        name: ui
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/checkout-redis configured
+        name: checkout-redis
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/checkout configured
+        name: checkout
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+        kind: Deployment
+        message: deployment.apps/carts-dynamodb configured
+        name: carts-dynamodb
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+        kind: Deployment
+        message: deployment.apps/catalog configured
+        name: catalog
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+        kind: Deployment
+        message: deployment.apps/orders configured
+        name: orders
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+        kind: Deployment
+        message: deployment.apps/checkout configured
+        name: checkout
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - redis:6.0-alpine
+        kind: Deployment
+        message: deployment.apps/checkout-redis configured
+        name: checkout-redis
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+        kind: Deployment
+        message: deployment.apps/ui configured
+        name: ui
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+        kind: Deployment
+        message: deployment.apps/carts configured
+        name: carts
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/docker/library/postgres:16.1
+        kind: StatefulSet
+        message: statefulset.apps/orders-postgresql configured
+        name: orders-postgresql
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/docker/library/rabbitmq:3-management
+        kind: StatefulSet
+        message: statefulset.apps/orders-rabbitmq configured
+        name: orders-rabbitmq
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        images:
+        - public.ecr.aws/docker/library/mysql:8.0
+        kind: StatefulSet
+        message: statefulset.apps/catalog-mysql configured
+        name: catalog-mysql
+        namespace: retail
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      revision: 437b6ba97d31080ada64d086a0a5fa0f3d31ae25
+      source:
+        path: infra/apps/retail
+        repoURL: https://github.com/wanghaibing07/retail-reliability-lab.git
+        targetRevision: main
+  reconciledAt: "2026-09-17T07:53:22Z"
+  resourceHealthSource: appTree
+  resources:
+  - kind: ConfigMap
+    name: carts
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ConfigMap
+    name: catalog
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ConfigMap
+    name: checkout
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ConfigMap
+    name: orders
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ConfigMap
+    name: ui
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Secret
+    name: catalog-db
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Secret
+    name: orders-db
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Secret
+    name: orders-rabbitmq
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: carts
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: carts-dynamodb
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: catalog
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: catalog-mysql
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: checkout
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: checkout-redis
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: orders
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: orders-postgresql
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: orders-rabbitmq
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: Service
+    name: ui
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ServiceAccount
+    name: carts
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ServiceAccount
+    name: catalog
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ServiceAccount
+    name: checkout
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ServiceAccount
+    name: orders
+    namespace: retail
+    status: Synced
+    version: v1
+  - kind: ServiceAccount
+    name: ui
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: carts
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: carts-dynamodb
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: catalog
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: checkout
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: checkout-redis
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: orders
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: ui
+    namespace: retail
+    status: OutOfSync
+    version: v1
+  - group: apps
+    kind: StatefulSet
+    name: catalog-mysql
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: StatefulSet
+    name: orders-postgresql
+    namespace: retail
+    status: Synced
+    version: v1
+  - group: apps
+    kind: StatefulSet
+    name: orders-rabbitmq
+    namespace: retail
+    status: Synced
+    version: v1
+  sourceHydrator: {}
+  sourceType: Kustomize
+  summary:
+    images:
+    - public.ecr.aws/aws-containers/retail-store-sample-cart:1.6.2
+    - public.ecr.aws/aws-containers/retail-store-sample-catalog:1.6.2
+    - public.ecr.aws/aws-containers/retail-store-sample-checkout:1.6.2
+    - public.ecr.aws/aws-containers/retail-store-sample-orders:1.6.2
+    - public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+    - public.ecr.aws/aws-dynamodb-local/aws-dynamodb-local:1.25.1
+    - public.ecr.aws/docker/library/mysql:8.0
+    - public.ecr.aws/docker/library/postgres:16.1
+    - public.ecr.aws/docker/library/rabbitmq:3-management
+    - redis:6.0-alpine
+  sync:
+    comparedTo:
+      destination:
+        namespace: retail
+        server: https://kubernetes.default.svc
+      source:
+        path: infra/apps/retail
+        repoURL: https://github.com/wanghaibing07/retail-reliability-lab.git
+        targetRevision: main
+    revision: 23f582e544b831f4ef663cf694e1feb8489950a9
+    status: OutOfSync

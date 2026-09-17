@@ -1,7 +1,7 @@
 # Retail Reliability Lab 镜像拉取可靠性 Runbook
 
-状态：已在本实验室验证（2026-09-12）  
-范围：`retail` 命名空间、k8s-worker1/2、containerd 2.3.4、Kubernetes 1.28.15
+状态：已在本实验室验证（2026-09-12）
+范围：`retail` 命名空间、k8s-worker1/2、containerd 2.3.4、Kubernetes v1.28.2
 
 ## 1. 结论先行
 

@@ -17,7 +17,7 @@
 | Stage 0 | Baseline + Incident #001 | ✅ 完成 |
 | Stage 1 | Reproducible Deploy | ✅ 完成 |
 | Stage 2 | CI Validation | ✅ 完成 |
-| Stage 3 | Argo CD / GitOps | 🚧 进行中 |
+| Stage 3 | Argo CD / GitOps | ✅ 手动 GitOps 已跑通 |
 | Stage 4 | Observability | ⏳ Planned |
 | Stage 5 | Backup / Restore | ⏳ Planned |
 | Stage 6 | Release Failure & Recovery | ⏳ Planned |
@@ -156,11 +156,16 @@ retail-reliability-lab/
 │   └── workflows/
 │       └── ci.yml
 ├── docs/
-│   └── incidents/
+│   ├── incidents/
+│   ├── runbooks/
+│   ├── decisions/
+│   └── gitops/
 ├── evidence/
 ├── infra/
-│   └── vendor/
-│       └── retail-v1.6.2.yaml
+│   ├── vendor/
+│   ├── apps/
+│   │   └── retail/
+│   └── argocd/
 ├── scripts/
 │   ├── prepull-images.sh
 │   ├── deploy.sh
@@ -171,39 +176,34 @@ retail-reliability-lab/
 
 ## 当前阶段：GitOps
 
-Argo CD 已安装并运行，后续将验证 Git 作为 Kubernetes 集群期望状态源，并完成 Application 管理、Manual Sync、Auto Sync 和 Self Heal。
+当前 Stage 3 的手动 GitOps 链路已跑通：
 
-计划验证：
+- Kustomize desired-state 入口：`infra/apps/retail`
+- GitHub Actions 对 rendered manifests 做 CI 校验
+- Argo CD declarative Application
+- 已有业务资源的安全接管
+- Argo CD annotation-based resource tracking（现场 33/33 个资源有 `argocd.argoproj.io/tracking-id`）
+- `Git PR → CI → Merge → OutOfSync → Manual Sync` 链路
+- PR #6 将 UI 从 1 副本扩为 2 副本，并完成 `2/2` 发布验证
+- PR #7 将 UI Service 从旧的 LoadBalancer 切换为 NodePort，完成健康状态修复
+- Incident #003 repo-server 到 GitHub 超时的受控排障
 
-```text
-Git Change
-    ↓
-Pull Request
-    ↓
-CI
-    ↓
-Merge
-    ↓
-Argo CD Sync
-    ↓
-Kubernetes
-    ↓
-verify.sh
-```
+健康状态的历史因果已记录：旧 UI Service 使用 LoadBalancer 且没有
+`status.loadBalancer.ingress` 时，Argo CD 曾显示 `Progressing`；PR #7 切换为
+NodePort 后，当前 Application 已恢复为 `Synced/Healthy`。
 
-同时进行 Configuration Drift 实验：
+当前保留的工程收口项：
 
-```text
-Git Desired State
-      ↓
-手工修改 Kubernetes
-      ↓
-产生 Drift
-      ↓
-Argo CD 检测
-      ↓
-Self Heal
-```
+- `deploy/prepull` 与 Argo 需要统一到 `infra/apps/retail`
+- Argo CD 平台配置与 repo-server retry 需要声明化管理
+- Auto Sync、Self Heal、Prune 尚待独立验证
+
+详细设计与实验记录：
+
+- [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
+- [Incidents](docs/incidents/)
+- [Runbooks](docs/runbooks/)
+- [Decisions](docs/decisions/)
 
 ## 项目边界
 
