@@ -3,11 +3,12 @@ set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-NAMESPACE="${NAMESPACE:-retail}"
+KUSTOMIZE_DIR="${KUSTOMIZE_DIR:-${ROOT_DIR}/infra/apps/retail}"
+NAMESPACE="retail"
 TIMEOUT="${TIMEOUT:-300s}"
 UI_SERVICE="${UI_SERVICE:-ui}"
 
-EVIDENCE_DIR="${ROOT_DIR}/evidence"
+EVIDENCE_DIR="${EVIDENCE_DIR:-${ROOT_DIR}/evidence}"
 mkdir -p "${EVIDENCE_DIR}"
 
 TIMESTAMP="$(date '+%Y%m%d-%H%M%S')"
@@ -40,10 +41,41 @@ command -v kubectl >/dev/null 2>&1 ||
 command -v curl >/dev/null 2>&1 ||
     fail "curl not found"
 
+[[ -f "${KUSTOMIZE_DIR}/kustomization.yaml" ]] ||
+    fail "Kustomization not found: ${KUSTOMIZE_DIR}"
+
+if ! EXPECTED_RESOURCE_OUTPUT="$(
+    kubectl apply         -k "${KUSTOMIZE_DIR}"         --dry-run=client         -o name
+)"; then
+    fail "Unable to render expected desired state"
+fi
+
+[[ -n "${EXPECTED_RESOURCE_OUTPUT}" ]] ||
+    fail "Expected desired state is empty"
+
+mapfile -t EXPECTED_RESOURCES <<< "${EXPECTED_RESOURCE_OUTPUT}"
+
+mapfile -t EXPECTED_WORKLOADS < <(
+    printf '%s\n' "${EXPECTED_RESOURCES[@]}" |
+        grep -E '^(deployment\.apps|statefulset\.apps)/' || true
+)
+
+mapfile -t EXPECTED_SERVICES < <(
+    printf '%s\n' "${EXPECTED_RESOURCES[@]}" |
+        grep -E '^service/' || true
+)
+
+[[ ${#EXPECTED_WORKLOADS[@]} -gt 0 ]] ||
+    fail "No expected Deployments/StatefulSets found"
+
+[[ ${#EXPECTED_SERVICES[@]} -gt 0 ]] ||
+    fail "No expected Services found"
+
 kubectl get namespace "${NAMESPACE}" >/dev/null 2>&1 ||
     fail "Namespace ${NAMESPACE} does not exist"
 
 pass "Kubernetes API and namespace are reachable"
+pass "Expected desired state: ${#EXPECTED_WORKLOADS[@]} workloads, ${#EXPECTED_SERVICES[@]} services"
 
 # --------------------------------------------------
 # 1. Workload verification
@@ -52,37 +84,50 @@ pass "Kubernetes API and namespace are reachable"
 echo
 echo "=== Layer 1: Workloads ==="
 
-mapfile -t WORKLOADS < <(
-    kubectl get deployments,statefulsets \
-        -n "${NAMESPACE}" \
-        -o name
-)
-
-[[ ${#WORKLOADS[@]} -gt 0 ]] ||
-    fail "No deployments/statefulsets found"
-
-for workload in "${WORKLOADS[@]}"; do
+for workload in "${EXPECTED_WORKLOADS[@]}"; do
     echo "[CHECK] ${workload}"
 
-    kubectl rollout status \
-        -n "${NAMESPACE}" \
-        "${workload}" \
-        --timeout="${TIMEOUT}"
+    if ! kubectl get         -n "${NAMESPACE}"         "${workload}"         >/dev/null; then
+        fail "Expected workload is missing: ${workload}"
+    fi
+
+    if ! kubectl rollout status         -n "${NAMESPACE}"         "${workload}"         --timeout="${TIMEOUT}"; then
+        fail "Workload rollout failed: ${workload}"
+    fi
 
     pass "${workload}"
 done
 
 echo
-echo "[CHECK] All Pods Ready"
+echo "[CHECK] Active Pods Ready"
 
-kubectl wait \
-    --for=condition=Ready \
-    pod \
-    --all \
-    -n "${NAMESPACE}" \
-    --timeout="${TIMEOUT}"
+if ! ACTIVE_POD_OUTPUT="$(
+    kubectl get pods         -n "${NAMESPACE}"         --field-selector='status.phase!=Succeeded,status.phase!=Failed'         -o name
+)"; then
+    fail "Unable to query active Pods"
+fi
 
-pass "All Pods are Ready"
+[[ -n "${ACTIVE_POD_OUTPUT}" ]] ||
+    fail "No active Pods found"
+
+mapfile -t ACTIVE_PODS <<< "${ACTIVE_POD_OUTPUT}"
+
+if ! kubectl wait     -n "${NAMESPACE}"     --for=condition=Ready     --timeout="${TIMEOUT}"     "${ACTIVE_PODS[@]}"; then
+    fail "One or more active Pods did not become Ready"
+fi
+
+pass "All active Pods are Ready"
+
+if ! FAILED_POD_OUTPUT="$(
+    kubectl get pods         -n "${NAMESPACE}"         --field-selector='status.phase=Failed'         -o name
+)"; then
+    fail "Unable to query Failed Pods"
+fi
+
+if [[ -n "${FAILED_POD_OUTPUT}" ]]; then
+    echo "[INFO] Terminal Failed/Evicted Pods are excluded from readiness:"
+    printf '%s\n' "${FAILED_POD_OUTPUT}"
+fi
 
 # --------------------------------------------------
 # 2. Service / EndpointSlice verification
@@ -91,33 +136,27 @@ pass "All Pods are Ready"
 echo
 echo "=== Layer 2: Services ==="
 
-mapfile -t SERVICES < <(
-    kubectl get services \
-        -n "${NAMESPACE}" \
-        -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
-)
+for svc_ref in "${EXPECTED_SERVICES[@]}"; do
+    svc="${svc_ref#service/}"
 
-for svc in "${SERVICES[@]}"; do
+    echo "[CHECK] service/${svc}"
 
-    # Ignore Services without selectors.
-    SELECTOR="$(
-        kubectl get service "${svc}" \
-            -n "${NAMESPACE}" \
-            -o jsonpath='{.spec.selector}' 2>/dev/null || true
-    )"
+    if ! SELECTOR="$(
+        kubectl get service "${svc}"             -n "${NAMESPACE}"             -o jsonpath='{.spec.selector}'
+    )"; then
+        fail "Expected Service is missing or unreadable: ${svc}"
+    fi
 
     if [[ -z "${SELECTOR}" || "${SELECTOR}" == "map[]" ]]; then
         echo "[SKIP] ${svc}: no selector"
         continue
     fi
 
-    READY_ENDPOINTS="$(
-        kubectl get endpointslice \
-            -n "${NAMESPACE}" \
-            -l "kubernetes.io/service-name=${svc}" \
-            -o jsonpath='{range .items[*].endpoints[?(@.conditions.ready==true)]}{.addresses[0]}{" "}{end}' \
-            2>/dev/null || true
-    )"
+    if ! READY_ENDPOINTS="$(
+        kubectl get endpointslice             -n "${NAMESPACE}"             -l "kubernetes.io/service-name=${svc}"             -o jsonpath='{range .items[*].endpoints[?(@.conditions.ready==true)]}{.addresses[0]}{" "}{end}'
+    )"; then
+        fail "Unable to query EndpointSlices for Service ${svc}"
+    fi
 
     if [[ -z "${READY_ENDPOINTS// }" ]]; then
         fail "Service ${svc} has no Ready Endpoint"
@@ -126,7 +165,7 @@ for svc in "${SERVICES[@]}"; do
     echo "[OK] ${svc}: ${READY_ENDPOINTS}"
 done
 
-pass "All selected Services have Ready Endpoints"
+pass "All expected selected Services have Ready Endpoints"
 
 # --------------------------------------------------
 # 3. Business HTTP verification
