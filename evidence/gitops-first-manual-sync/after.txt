@@ -1,0 +1,22 @@
+=== AFTER MANUAL SYNC ===
+time=2026-09-17T16:50:40+08:00
+git=23f582e544b831f4ef663cf694e1feb8489950a9
+
+NAME     SYNC STATUS   HEALTH STATUS
+retail   Synced        Progressing
+
+argo_revision=23f582e544b831f4ef663cf694e1feb8489950a9
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+ui     2/2     2            2           3d12h
+
+NAME                              READY   STATUS    RESTARTS       AGE   IP             NODE          NOMINATED NODE   READINESS GATES
+ui-699d9bd74f-6zb8j               1/1     Running   0              97s   10.244.1.135   k8s-worker1   <none>           <none>
+ui-699d9bd74f-dlr6q               1/1     Running   3 (21h ago)    44h   10.244.2.85    k8s-worker2   <none>           <none>
+=== POST-SYNC VERIFICATION ===
+time=2026-09-17T18:29:56+08:00
+scripts/verify.sh=PASS
+rollouts=10/10
+retail_pods_ready=11/11
+services_with_ready_endpoints=10/10
+business_http=200
+note=Argo health remained Progressing; no Healthy claim was made.

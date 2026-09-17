@@ -23,6 +23,14 @@ containerd 在恢复历史 sandbox 和 overlayfs snapshot 状态时持续发生 
 - 部分 Service 丢失 Ready Endpoint
 - Retail 业务出现访问异常
 
+## Timeline
+
+- 宿主机发生非正常断电，虚拟机恢复后 worker2 的 containerd 开始反复退出。
+- containerd 在恢复历史 sandbox 和 overlayfs snapshot 状态时触发 bbolt panic。
+- kubelet 仍在尝试管理节点，但运行时不稳定，多个业务 Pod 进入 `Unknown`。
+- Flannel 因 `/run/flannel/subnet.env` 缺失无法完成 Pod 网络初始化。
+- 隔离 worker2、保存故障现场后重建 containerd root，随后重启 kubelet 和 Flannel。
+- 节点、运行时、Pod、Service Endpoint 和业务 HTTP 均恢复后解除 cordon。
 ## Key Evidence
 
 containerd 出现：
@@ -70,6 +78,17 @@ no such file or directory
 现有证据能够证明 containerd metadata 与 snapshot 状态异常，
 但无法证明异常断电是唯一可能原因，因此不将其描述为确定的唯一根因。
 
+## What Was Ruled Out
+
+调查中未发现以下因素是本次故障的主要原因：
+
+- Retail 应用镜像或业务进程本身损坏
+- Kubernetes Service 配置错误
+- 单纯的业务清单变更
+- 持续性的磁盘 I/O 错误
+- 需要保留的 StatefulSet/PV 数据被误删
+
+这些判断基于现场日志、磁盘检查和恢复后的分层验收；它们不等于证明所有潜在基础设施因素都不存在。
 ## Recovery
 
 恢复前确认：
@@ -108,3 +127,11 @@ no such file or directory
 - StatefulSet / PV 必须在清理运行时前确认数据位置
 - 故障恢复必须验证业务 HTTP，而不是只检查 Pod Running
 - containerd 故障现场应先备份后清理
+
+## Follow-up Actions
+
+- 为三台 VM 建立可重复的正常关机、启动和节点 Ready 检查流程。
+- 将 containerd、Flannel 和节点级恢复证据纳入故障演练清单。
+- 对需要持久化的数据先核对 PV、备份和恢复路径，再决定是否隔离运行时目录。
+- 为 containerd bbolt、snapshotter、kubelet 和 CNI 异常增加集中化日志或采集脚本。
+- 将“运行时恢复”与“业务 HTTP 验收”保留为两个独立检查点，避免只看到 Node Ready 就宣布恢复。

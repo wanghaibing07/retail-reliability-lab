@@ -1,0 +1,2 @@
+NAME                                  READY   STATUS    RESTARTS   AGE   IP            NODE          NOMINATED NODE   READINESS GATES
+argocd-repo-server-7cf789b7b7-252n4   1/1     Running   0          11h   10.244.2.93   k8s-worker2   <none>           <none>
