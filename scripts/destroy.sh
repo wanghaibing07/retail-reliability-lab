@@ -58,12 +58,28 @@ echo
 APP_EXISTS=false
 NS_EXISTS=false
 
-if kubectl -n "${ARGO_NAMESPACE}" get application "${APPLICATION}" \
-    >/dev/null 2>&1; then
+if ! APPLICATION_REF="$(
+    kubectl -n "${ARGO_NAMESPACE}" \
+        get application "${APPLICATION}" \
+        --ignore-not-found \
+        -o name
+)"; then
+    fail "Unable to verify Argo Application ${ARGO_NAMESPACE}/${APPLICATION}"
+fi
+
+if [[ -n "${APPLICATION_REF}" ]]; then
     APP_EXISTS=true
 fi
 
-if kubectl get namespace "${NAMESPACE}" >/dev/null 2>&1; then
+if ! NAMESPACE_REF="$(
+    kubectl get namespace "${NAMESPACE}" \
+        --ignore-not-found \
+        -o name
+)"; then
+    fail "Unable to verify Retail namespace ${NAMESPACE}"
+fi
+
+if [[ -n "${NAMESPACE_REF}" ]]; then
     NS_EXISTS=true
 fi
 
@@ -72,13 +88,19 @@ if ! ${APP_EXISTS} && ! ${NS_EXISTS}; then
     exit 0
 fi
 
+if ! ${APP_EXISTS} && ${NS_EXISTS}; then
+    fail "Retail namespace exists but Argo Application is absent; refusing automatic deletion"
+fi
+
 # Refuse unexpected Argo deletion semantics.
 if ${APP_EXISTS}; then
-    FINALIZERS="$(
+    if ! FINALIZERS="$(
         kubectl -n "${ARGO_NAMESPACE}" \
             get application "${APPLICATION}" \
             -o jsonpath='{.metadata.finalizers}'
-    )"
+    )"; then
+        fail "Unable to verify finalizers on Argo Application ${ARGO_NAMESPACE}/${APPLICATION}"
+    fi
 
     if [[ -n "${FINALIZERS}" && "${FINALIZERS}" != "[]" ]]; then
         fail "Argo Application has finalizers: ${FINALIZERS}. Review deletion semantics first."
