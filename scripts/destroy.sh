@@ -58,18 +58,33 @@ echo
 APP_EXISTS=false
 NS_EXISTS=false
 
-if kubectl -n "${ARGO_NAMESPACE}" get application "${APPLICATION}" \
-    >/dev/null 2>&1; then
+if ! APP_REF="$(
+    kubectl -n "${ARGO_NAMESPACE}"         get application "${APPLICATION}"         --ignore-not-found         -o name
+)"; then
+    fail "Unable to determine Argo Application state"
+fi
+
+if [[ -n "${APP_REF}" ]]; then
     APP_EXISTS=true
 fi
 
-if kubectl get namespace "${NAMESPACE}" >/dev/null 2>&1; then
+if ! NS_REF="$(
+    kubectl get namespace "${NAMESPACE}"         --ignore-not-found         -o name
+)"; then
+    fail "Unable to determine Retail namespace state"
+fi
+
+if [[ -n "${NS_REF}" ]]; then
     NS_EXISTS=true
 fi
 
 if ! ${APP_EXISTS} && ! ${NS_EXISTS}; then
     echo "[PASS] Retail Application and namespace are already absent"
     exit 0
+fi
+
+if ! ${APP_EXISTS} && ${NS_EXISTS}; then
+    fail "Retail namespace exists but Argo Application is absent; refusing orphan namespace deletion"
 fi
 
 # Refuse unexpected Argo deletion semantics.
