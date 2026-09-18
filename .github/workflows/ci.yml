@@ -33,15 +33,29 @@ jobs:
           sudo install -m 0755 kubectl /usr/local/bin/kubectl
           kubectl version --client
 
+      - name: Verify vendored Argo CD manifest
+        run: |
+          cd infra/argocd/platform/vendor/argocd-v3.5.2
+          sha256sum -c install.yaml.sha256
+
       - name: Render Kustomize manifests
         run: |
           kubectl kustomize infra/apps/retail \
             > /tmp/retail-rendered.yaml
 
-          test -s /tmp/retail-rendered.yaml
+          kubectl kustomize infra/argocd/platform \
+            > /tmp/argocd-platform-rendered.yaml
 
-          echo "Rendered resources:"
+          test -s /tmp/retail-rendered.yaml
+          test -s /tmp/argocd-platform-rendered.yaml
+
+          echo "Retail resources:"
           grep '^kind:' /tmp/retail-rendered.yaml \
+            | sort \
+            | uniq -c
+
+          echo "Argo CD platform resources:"
+          grep '^kind:' /tmp/argocd-platform-rendered.yaml \
             | sort \
             | uniq -c
 
@@ -61,6 +75,12 @@ jobs:
             -summary \
             -kubernetes-version 1.28.0 \
             /tmp/retail-rendered.yaml
+
+          kubeconform \
+            -strict \
+            -summary \
+            -kubernetes-version 1.28.0 \
+            /tmp/argocd-platform-rendered.yaml
 
       - name: Reject latest image tags
         run: |
