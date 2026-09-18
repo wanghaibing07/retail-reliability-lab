@@ -9,4 +9,3 @@ resources:
 patches:
   - path: patches/ui-replicas.yaml
   - path: patches/ui-service-nodeport.yaml
-  - path: patches/ui-auto-sync-test.yaml
