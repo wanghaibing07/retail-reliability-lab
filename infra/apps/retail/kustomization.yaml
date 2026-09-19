@@ -5,6 +5,7 @@ namespace: retail
 
 resources:
   - ../../vendor
+  - prune-probe.yaml
 
 patches:
   - path: patches/ui-replicas.yaml
