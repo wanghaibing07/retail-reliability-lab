@@ -9,3 +9,6 @@ resources:
 patches:
   - path: patches/ui-replicas.yaml
   - path: patches/ui-service-nodeport.yaml
+  - path: patches/catalog-mysql-prune-confirm.yaml
+  - path: patches/orders-postgresql-prune-confirm.yaml
+  - path: patches/orders-rabbitmq-prune-confirm.yaml

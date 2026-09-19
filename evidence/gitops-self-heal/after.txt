@@ -1,0 +1,10 @@
+=== Self Heal verification ===
+Observed: 2026-09-20 05:09:09 +0800
+
+auto=true
+selfHeal=true
+prune=false
+sync=Synced
+health=Healthy
+
+ui replicas=2 ready=2
