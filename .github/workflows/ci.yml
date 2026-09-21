@@ -14,7 +14,7 @@ jobs:
 
       - name: Check Bash syntax
         run: |
-          for file in scripts/*.sh; do
+          for file in scripts/*.sh tests/*.sh; do
             echo "Checking ${file}"
             bash -n "${file}"
           done
@@ -25,7 +25,10 @@ jobs:
           sudo apt-get install -y shellcheck
 
       - name: Run ShellCheck
-        run: shellcheck scripts/*.sh
+        run: shellcheck scripts/*.sh tests/*.sh
+
+      - name: Test image tag policy
+        run: ./tests/test-check-image-tags.sh
 
       - name: Install kubectl
         run: |
@@ -95,11 +98,4 @@ jobs:
             /tmp/argocd-platform-rendered.yaml
 
       - name: Reject latest image tags
-        run: |
-          if grep -E '^[[:space:]]*image:.*:latest([[:space:]]|$)' \
-            /tmp/retail-rendered.yaml; then
-            echo "[FAIL] latest image tag detected"
-            exit 1
-          fi
-
-          echo "[PASS] No latest image tags"
+        run: ./scripts/check-image-tags.sh /tmp/retail-rendered.yaml
