@@ -2,102 +2,399 @@
 
 ## Goal
 
-Make Git the source of desired Kubernetes application state while keeping delivery observable and reversible.
+Make Git the single source of desired Kubernetes application state while keeping delivery observable, testable, recoverable, and bounded by destructive-operation safeguards.
 
 ## Desired-State Path
 
-The Retail desired state used by CI and Argo CD is:
+Retail desired state is:
 
-~~~text
+```text
 infra/apps/retail
-~~~
+```
 
-Kustomize composes the fixed upstream manifest in infra/vendor/ with project patches.
+The following paths now use the same desired state:
 
-## CI Flow
+```text
+Argo CD
+CI
+deploy.sh
+prepull-images.sh
+```
 
-Pull requests and pushes validate:
+The old direct vendor-manifest deployment path is no longer a second source of truth.
 
-~~~text
-Bash syntax
-→ ShellCheck
-→ kubectl kustomize
-→ kubeconform on rendered output
-→ reject :latest
-~~~
+## CI Gate
 
-CI validates rendered desired state rather than only the raw vendor manifest.
+Changes follow:
 
-## Argo CD Application
+```text
+feature branch
+→ Pull Request
+→ required validate check
+→ merge to protected main
+```
 
-The Application tracks:
+CI validates:
 
-| Field | Value |
-| --- | --- |
-| Repository | wanghaibing07/retail-reliability-lab |
-| Revision | main |
-| Path | infra/apps/retail |
-| Namespace | retail |
+- Bash syntax
+- ShellCheck
+- image-tag policy regression tests
+- Retail Kustomize render
+- Argo CD platform Kustomize render
+- Argo CD CRD presence
+- kubeconform schema validation
+- rejection of `latest` image tags
 
-The Application was initially operated with Manual Sync so that Git observation and deployment could be demonstrated separately.
+The Argo CD CRDs use the narrow exception:
 
-## Resource Adoption
+```text
+-skip CustomResourceDefinition
+```
 
-The initial adoption preserved the upstream business labels. The live resource audit
-found annotation-based Argo tracking: 33/33 observed resources carried
-`argocd.argoproj.io/tracking-id`, while 0/33 carried the previously documented
-`argocd.argoproj.io/instance` tracking label. The decision is recorded in
-[ADR 001](../decisions/001-argocd-resource-tracking.md).
+rather than globally ignoring missing schemas.
 
-## First GitOps Change
+## Declarative Argo CD Platform
 
-PR #6 changed the UI replica count from 1 to 2 through a Kustomize patch. The PR passed CI and was merged to main at revision 23f582e.
+Argo CD platform configuration is managed from:
 
-The resulting release sequence was:
+```text
+infra/argocd/platform
+```
 
-~~~text
+The repository declares:
+
+```text
+application.resourceTrackingMethod: annotation
+```
+
+and the repo-server retry mitigation:
+
+```text
+ARGOCD_GIT_ATTEMPTS_COUNT=3
+```
+
+A server-side diff was reviewed before takeover.
+
+After apply, the platform reached:
+
+```text
+Git desired state = live Argo CD state
+```
+
+with final:
+
+```text
+kubectl diff --server-side -k infra/argocd/platform
+rc=0
+```
+
+## Resource Tracking
+
+Argo ownership uses:
+
+```text
+argocd.argoproj.io/tracking-id
+```
+
+Business identity continues to use labels such as:
+
+```text
+app.kubernetes.io/instance=catalog
+```
+
+The two concepts are intentionally kept separate.
+
+The live audit observed:
+
+```text
+33/33 resources with argocd.argoproj.io/tracking-id
+0/33 resources with argocd.argoproj.io/instance
+```
+
+The tracking mode is now also explicitly declared in Git.
+
+See [ADR 001](../decisions/001-argocd-resource-tracking.md).
+
+## Manual Sync
+
+PR #6 changed the UI replica count from 1 to 2.
+
+The release path was:
+
+```text
 Git change
-→ Pull request
-→ CI pass
+→ Pull Request
+→ CI
 → merge
-→ Argo detects OutOfSync
+→ OutOfSync
 → Manual Sync
 → UI 2/2
-~~~
+```
 
-The before/after snapshots are kept in [the Manual Sync evidence](../../evidence/gitops-first-manual-sync/after.txt).
+This proved the initial controlled GitOps delivery path.
 
-## Health Status Correction
+## Auto Sync
 
-The old UI Service used `LoadBalancer` without a populated
-`status.loadBalancer.ingress`, so Argo CD previously reported `Progressing` even
-after the workload itself was available. PR #7 changed the UI Service to
-`NodePort`; after that change the Application reached `Synced/Healthy`.
+Automated sync was enabled with prune and self-heal initially disabled.
 
-This records the historical `Progressing` state and its fix rather than treating
-it as the current health state.
+A harmless UI Service annotation was then added through Git.
 
-## Verification
+After merge:
 
-The current verification run reported:
+```text
+Git main
+→ Argo polling
+→ automatic reconciliation
+→ live annotation present
+```
 
-- 10 Deployment/StatefulSet rollouts passed
-- all 11 current Retail Pods were Ready
-- all 10 selected Services had Ready endpoints
-- business HTTP returned 200
+No Manual Sync was used.
 
-## Repository Access Incident
+A later PR removed the annotation and Argo automatically reconciled the cleanup.
 
-During this experiment Argo CD repo-server intermittently failed Git requests to GitHub. See [Incident #003](../incidents/003-argocd-repo-server-github-timeout/README.md). The incident is kept separate from the normal GitOps release workflow.
+Result:
 
-## Remaining Stage 3 Work
+```text
+Auto Sync = PASS
+```
 
-~~~text
-1. Remove multiple desired-state entry points
-2. Declaratively manage Argo platform configuration
-3. Enable and test Auto Sync with prune disabled
-4. Enable and test Self Heal
-5. Test prune separately with an explicit safety policy
-~~~
+Evidence:
 
-Auto Sync, self-heal and prune remain separate capabilities. They are not claimed as completed by the Manual Sync evidence.
+```text
+evidence/gitops-auto-sync
+```
+
+## Self Heal
+
+Git desired state kept:
+
+```text
+UI replicas = 2
+```
+
+The live Deployment was manually drifted to:
+
+```text
+replicas = 1
+```
+
+No Git commit and no Manual Sync followed.
+
+Argo CD automatically restored:
+
+```text
+spec=2
+ready=2
+```
+
+Retail verification and HTTP checks passed afterward.
+
+Result:
+
+```text
+Self Heal = PASS
+```
+
+Evidence:
+
+```text
+evidence/gitops-self-heal
+```
+
+## Prune Safety
+
+Before enabling automatic pruning, the three data-bearing StatefulSets were protected with:
+
+```text
+argocd.argoproj.io/sync-options: Prune=confirm
+```
+
+Protected resources:
+
+```text
+catalog-mysql
+orders-postgresql
+orders-rabbitmq
+```
+
+This prevents the Application-level automatic prune policy from silently deleting these workloads.
+
+The databases still use `emptyDir`; this guardrail does not provide persistence or backup.
+
+## Auto Prune
+
+Application policy is:
+
+```yaml
+syncPolicy:
+  automated:
+    enabled: true
+    prune: true
+    selfHeal: true
+    allowEmpty: false
+```
+
+Auto Prune was tested using only a disposable ConfigMap:
+
+```text
+gitops-prune-probe
+```
+
+Experiment:
+
+```text
+PR #20
+Git adds ConfigMap
+→ Argo creates ConfigMap
+
+PR #21
+Git removes ConfigMap
+→ no Manual Sync
+→ no kubectl delete
+→ Argo automatically removes ConfigMap
+```
+
+The final Stage 3 validation confirmed that the probe is absent.
+
+Result:
+
+```text
+Auto Prune = PASS
+```
+
+Evidence:
+
+```text
+evidence/gitops-auto-prune
+```
+
+## Verification Model
+
+`verify.sh` validates from Git expected state rather than discovering whatever happens to exist live.
+
+It checks:
+
+1. expected workloads exist
+2. Deployment / StatefulSet rollout
+3. active Pods are Ready
+4. terminal Pods do not pollute readiness
+5. expected Services exist
+6. Service API failures are not hidden
+7. Ready EndpointSlices exist
+8. UI HTTP returns 2xx
+
+A negative test previously proved that a Git-expected but missing Deployment causes verification to fail.
+
+Principle:
+
+```text
+A validator must prove both:
+healthy state passes
+and
+broken state is actually detected
+```
+
+## Destructive Operation Boundary
+
+`destroy.sh` is GitOps-aware and fail-closed.
+
+It includes:
+
+- `--dry-run`
+- interactive confirmation
+- `--yes`
+- Argo Application checks
+- finalizer awareness
+- StatefulSet `emptyDir` warning
+- Argo management shutdown before namespace deletion
+- distinction between NotFound and API/RBAC/network failure
+
+Principle:
+
+```text
+Unable to prove safe
+≠ safe to delete
+```
+
+## Incident #003
+
+Argo CD repo-server intermittently failed GitHub access.
+
+Evidence narrowed the failure domain to the shared VMware guest outbound path.
+
+The exact component has not been proven.
+
+Current mitigation:
+
+```text
+ARGOCD_GIT_ATTEMPTS_COUNT=3
+```
+
+The mitigation is declaratively managed in Git.
+
+This is not described as a root-cause fix.
+
+See:
+
+```text
+docs/incidents/003-argocd-repo-server-github-timeout/README.md
+```
+
+## Final Stage 3 Validation
+
+The final validation confirmed:
+
+```text
+Application = Synced / Healthy
+Auto Sync = enabled
+Self Heal = enabled
+Auto Prune = enabled
+allowEmpty = false
+3 StatefulSets = Prune=confirm
+prune probe = absent
+Retail verify = PASS
+business HTTP = PASS
+Argo platform diff = 0
+```
+
+Stage 3 therefore demonstrates:
+
+```text
+protected Git change
+→ required CI
+→ desired-state reconciliation
+→ drift correction
+→ controlled pruning
+→ workload/service/business validation
+→ auditable evidence
+```
+
+## Boundaries
+
+Stage 3 does not claim:
+
+- production-grade HA
+- database persistence
+- database backup or restore
+- complete disaster recovery
+- Incident #003 root-cause remediation
+- HTTP 200 as proof of data integrity
+
+Those concerns belong to later stages.
+
+## Next Stage
+
+Stage 4 focuses on Observability.
+
+The objective is not merely to install monitoring components.
+
+The required engineering loop is:
+
+```text
+Metrics
+→ Alert
+→ Incident
+→ Diagnosis
+→ Recovery
+→ Evidence
+```

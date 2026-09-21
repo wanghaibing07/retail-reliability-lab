@@ -1,0 +1,1 @@
+PASS: gitops-prune-probe absent

@@ -1,0 +1,11 @@
+NAME                      ADDRESSTYPE   PORTS        ENDPOINTS                  AGE
+carts-dynamodb-thrrn      IPv4          8000         10.244.2.88                8d
+carts-rbdrb               IPv4          8080         10.244.2.91                8d
+catalog-ls8rd             IPv4          8080         10.244.1.132               8d
+catalog-mysql-86mt4       IPv4          3306         10.244.1.127               8d
+checkout-c4ttt            IPv4          8080         10.244.2.90                8d
+checkout-redis-246wd      IPv4          6379         10.244.2.92                8d
+orders-postgresql-2qbkl   IPv4          5432         10.244.2.86                8d
+orders-rabbitmq-s5l6c     IPv4          15672,5672   10.244.2.87                8d
+orders-x2ntq              IPv4          8080         10.244.1.128               8d
+ui-x7xx4                  IPv4          8080         10.244.2.85,10.244.1.136   8d
