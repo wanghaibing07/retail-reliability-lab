@@ -379,15 +379,27 @@ Recovery was validated by confirming:
 
 ## Follow-up Actions
 
-### P0 — Declaratively manage Argo CD retry configuration
+### Completed — Declaratively manage Argo CD retry configuration
 
-Move:
+The retry mitigation:
 
 ```text
 ARGOCD_GIT_ATTEMPTS_COUNT=3
 ```
 
-from an imperative live-cluster change into repository-managed Argo CD configuration.
+has been moved from an imperative live-cluster change into repository-managed
+Argo CD platform configuration.
+
+The Argo platform desired state was applied with server-side apply and later
+validated with:
+
+```text
+kubectl diff --server-side -k infra/argocd/platform
+rc=0
+```
+
+This closes the configuration-management follow-up, but does not change the
+incident root-cause assessment.
 
 ### P0 — Preserve the recovered control-plane state
 

@@ -1,0 +1,7 @@
+sync=Synced
+health=Healthy
+revision=9218facf4a80b7dea714c52d0cdb8ee006b42fc1
+auto=true
+selfHeal=true
+prune=true
+allowEmpty=false

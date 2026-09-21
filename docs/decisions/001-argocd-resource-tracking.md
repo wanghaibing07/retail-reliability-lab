@@ -16,19 +16,29 @@ An audit of the running Retail Application recorded `argocd.argoproj.io/tracking
 
 ## Decision
 
-Record and use Argo CD's annotation-based resource tracking as observed in the live cluster:
+Use Argo CD annotation-based resource tracking and declare the tracking mode explicitly in Git.
+
+The Argo CD platform configuration now contains:
+
+~~~
+application.resourceTrackingMethod: annotation
+~~~
+
+Argo ownership is represented on resources through:
 
 ~~~
 argocd.argoproj.io/tracking-id
 ~~~
 
-Do not describe `argocd.argoproj.io/instance` as a configured tracking label unless a future, separately reviewed declarative configuration change proves it. Keep business identity labels such as `app.kubernetes.io/instance` separate from Argo-owned tracking metadata.
+Keep business identity labels such as `app.kubernetes.io/instance` separate from Argo-owned tracking metadata.
 
 ## Live Evidence
 
 - 33/33 observed Retail resources carried an `argocd.argoproj.io/tracking-id` annotation.
 - 0/33 observed Retail resources carried an `argocd.argoproj.io/instance` tracking label.
-- `infra/argocd/retail-application.yaml` does not declare `application.instanceLabelKey`.
+- `infra/argocd/platform` explicitly declares `application.resourceTrackingMethod: annotation`.
+- The same platform configuration declares `application.instanceLabelKey: argocd.argoproj.io/instance`.
+- With `resourceTrackingMethod: annotation`, resource ownership is tracked through the Argo tracking annotation rather than that label key.
 
 ## Result
 
@@ -45,7 +55,8 @@ remain unchanged.
 - Argo ownership is kept separate from application identity.
 - The documentation matches the observed live resource metadata.
 - Tracking mode remains auditable through the Application resource tree and resource annotations.
-- Any future tracking-mode change must be declared in Git and validated against a fresh resource audit.
+- Tracking mode is explicitly versioned in Git.
+- Any future tracking-mode change must go through normal review and a fresh resource audit.
 
 ## Related Work
 

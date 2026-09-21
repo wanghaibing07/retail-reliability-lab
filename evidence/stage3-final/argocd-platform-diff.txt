@@ -1,0 +1,1 @@
+argocd platform diff rc=0

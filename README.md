@@ -17,10 +17,12 @@
 | Stage 0 | Baseline + Incident #001 | ✅ 完成 |
 | Stage 1 | Reproducible Deploy | ✅ 完成 |
 | Stage 2 | CI Validation | ✅ 完成 |
-| Stage 3 | Argo CD / GitOps | ✅ 手动 GitOps 已跑通 |
+| Stage 3 | Argo CD / GitOps | ✅ 完成 |
 | Stage 4 | Observability | ⏳ Planned |
 | Stage 5 | Backup / Restore | ⏳ Planned |
 | Stage 6 | Release Failure & Recovery | ⏳ Planned |
+| Stage 7 | Performance / Capacity | ⏳ Planned |
+| Stage 8 | Portfolio / Interview Packaging | ⏳ Planned |
 
 ## 已完成能力
 
@@ -174,31 +176,56 @@ retail-reliability-lab/
 └── README.md
 ```
 
-## 当前阶段：GitOps
+## Stage 3：Argo CD / GitOps
 
-当前 Stage 3 的手动 GitOps 链路已跑通：
+Stage 3 已完成 GitOps 交付闭环：
 
-- Kustomize desired-state 入口：`infra/apps/retail`
-- GitHub Actions 对 rendered manifests 做 CI 校验
-- Argo CD declarative Application
-- 已有业务资源的安全接管
-- Argo CD annotation-based resource tracking（现场 33/33 个资源有 `argocd.argoproj.io/tracking-id`）
-- `Git PR → CI → Merge → OutOfSync → Manual Sync` 链路
-- PR #6 将 UI 从 1 副本扩为 2 副本，并完成 `2/2` 发布验证
-- PR #7 将 UI Service 从旧的 LoadBalancer 切换为 NodePort，完成健康状态修复
-- Incident #003 repo-server 到 GitHub 超时的受控排障
+- `infra/apps/retail` 是 Retail 唯一 desired-state 入口
+- CI、Argo CD、`deploy.sh`、`prepull-images.sh` 统一使用该入口
+- Argo CD 平台配置已通过 Git/Kustomize 声明化管理
+- Resource Tracking 显式配置为 annotation
+- GitHub `main` 已启用 branch protection 和 required CI
+- Manual Sync 已验证
+- Auto Sync 已验证
+- Self Heal 已验证
+- Auto Prune 已通过一次性 ConfigMap 实验验证
+- MySQL、PostgreSQL、RabbitMQ StatefulSet 使用 `Prune=confirm`
+- `destroy.sh` 已具备 GitOps-aware、dry-run 和 fail-closed 防护
+- `verify.sh` 从 Git expected state 出发验证 workload、Service、EndpointSlice 和 HTTP
 
-健康状态的历史因果已记录：旧 UI Service 使用 LoadBalancer 且没有
-`status.loadBalancer.ingress` 时，Argo CD 曾显示 `Progressing`；PR #7 切换为
-NodePort 后，当前 Application 已恢复为 `Synced/Healthy`。
+当前自动同步策略：
 
-当前保留的工程收口项：
+```yaml
+automated:
+  enabled: true
+  prune: true
+  selfHeal: true
+  allowEmpty: false
+```
 
-- `deploy/prepull` 与 Argo 需要统一到 `infra/apps/retail`
-- Argo CD 平台配置与 repo-server retry 需要声明化管理
-- Auto Sync、Self Heal、Prune 尚待独立验证
+Stage 3 最终验证确认：
 
-详细设计与实验记录：
+```text
+Git main
+→ protected PR / required CI
+→ Argo reconciliation
+→ Synced / Healthy
+→ workload ready
+→ Service ready endpoints
+→ business HTTP 200
+```
+
+同时确认：
+
+- Auto Prune probe 已删除
+- 3 个 StatefulSet 保持 `Prune=confirm`
+- Argo CD platform 与 Git desired state 无 drift
+- Incident #003 的 retry mitigation 已声明化
+
+Incident #003 的底层 VMware guest outbound 网络问题仍未定位到唯一组件，
+因此只声明为“部分缓解”，不宣称根因已经修复。
+
+详细记录：
 
 - [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
 - [Incidents](docs/incidents/)

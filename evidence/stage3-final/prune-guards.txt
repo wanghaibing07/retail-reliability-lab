@@ -1,0 +1,3 @@
+catalog-mysql = Prune=confirm
+orders-postgresql = Prune=confirm
+orders-rabbitmq = Prune=confirm
