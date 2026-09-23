@@ -318,27 +318,63 @@ Unable to prove safe
 
 ## Incident #003
 
-Argo CD repo-server intermittently failed GitHub access.
+Argo CD repo-server intermittently failed direct GitHub access.
 
-Evidence narrowed the failure domain to the shared VMware guest outbound path.
+The incident reproduced again during the Kubernetes 1.36.4 rebuild.
 
-The exact component has not been proven.
+The latest investigation ruled out the Kubernetes application/network stack as a sufficient explanation and narrowed the supported failure boundary to an intermittent direct GitHub network path outside the validated guest SNAT path.
 
-Current mitigation:
+Current controls are:
 
 ```text
 ARGOCD_GIT_ATTEMPTS_COUNT=3
+repository-specific proxy=http://192.168.88.1:7890
 ```
 
-The mitigation is declaratively managed in Git.
+The proxy path was repeatedly validated from both the node and repo-server.
 
-This is not described as a root-cause fix.
+This is documented as a mitigation, not as proof that the direct-path root cause has been repaired.
 
 See:
 
 ```text
 docs/incidents/003-argocd-repo-server-github-timeout/README.md
 ```
+
+## Post-Stage-3 Rebuild Validation
+
+On 2026-09-23 the lab cluster was rebuilt onto Kubernetes 1.36.4.
+
+The recovery path validated:
+
+```text
+new control plane
+→ Flannel
+→ worker rejoin
+→ retained Registry restore
+→ dynamic storage restore
+→ Argo CD platform restore
+→ Retail Application reconciliation
+→ verify.sh
+```
+
+Final state:
+
+```text
+3/3 Kubernetes Nodes Ready
+Argo Application Synced / Healthy
+Git revision 3c5e7c088cc93402d4b947443738a342b0fe863d
+10/10 workloads verified
+all selected Services have Ready EndpointSlices
+11/11 Retail Pods Ready
+business HTTP 200
+```
+
+The repo-server was restarted and a hard Application refresh was performed afterward. The Application remained Synced/Healthy.
+
+This gives an additional real rebuild proof for the Stage 1 and Stage 3 reproducibility claims.
+
+See [Decision 002](../decisions/002-kubernetes-136-rebuild.md).
 
 ## Final Stage 3 Validation
 

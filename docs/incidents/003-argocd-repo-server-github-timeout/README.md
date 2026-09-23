@@ -2,17 +2,24 @@
 
 ## Status
 
-**Partially mitigated — control-plane comparison recovered; underlying guest-egress fault remains unresolved**
+**Mitigated — repository-specific proxy validated; direct GitHub path remains unresolved**
 
-Argo CD currently has a retry mitigation in place:
+The original retry mitigation remains enabled:
 
 ```text
 ARGOCD_GIT_ATTEMPTS_COUNT=3
 ```
 
-The GitOps comparison path recovered and Argo CD can resolve the latest Git revision again.
+A stronger mitigation is now also validated for the Retail repository:
 
-The underlying intermittent network fault has not been proven down to a single VMware or Windows networking component.
+```text
+Argo CD repository-specific HTTP proxy
+→ http://192.168.88.1:7890
+```
+
+The proxy path was validated from worker nodes and from inside `argocd-repo-server`.
+
+The direct GitHub path remains intermittently unreliable and its exact external failure point has not been proven.
 
 ## Summary
 
@@ -229,62 +236,66 @@ This is the strongest localization evidence collected during the incident.
 
 ## Root Cause Assessment
 
-### Confirmed failure mechanism
+### Updated evidence from the Kubernetes 1.36.4 rebuild
 
-Argo CD repository operations intermittently failed because HTTPS/Git connections from the Kubernetes VMware guests toward GitHub did not reliably complete.
+Incident #003 reproduced again after the cluster was rebuilt.
 
-Most final controlled-test failures occurred before TCP connection establishment completed.
+The failure was observed from:
 
-At least one request progressed beyond TLS but stalled before receiving an HTTP response.
+* Kubernetes nodes
+* temporary Pods
+* Argo CD repo-server
+* the Windows host path toward GitHub
 
-### Confirmed failure domain
+During failure windows, packet capture showed TCP SYN packets leaving toward GitHub without a returned SYN/ACK.
 
-The failure reproduced on:
+The same environment could successfully reach other HTTPS destinations.
 
-- worker1 guest OS
-- worker2 guest OS
-- Pods running on both workers
-- Argo CD repo-server
-
-At the same time, the Windows VMware host completed all 30 requests to the same endpoint successfully.
-
-This rules out the following as sufficient explanations:
-
-- a worker1-only failure
-- a repo-server-only failure
-- a Kubernetes Pod-only failure
-- Flannel being required for the failure
-- Git repository URL or branch misconfiguration
-- a persistent GitHub-wide outage during the final test window
-
-### Strongly implicated shared path
-
-The evidence strongly implicates the shared VMware guest egress path between the virtual machines and the Windows host uplink, including components such as:
+The investigation also confirmed:
 
 ```text
-VMware VMnet8 NAT network
-VMware NAT Service
-Windows host virtual-network forwarding/filtering path
+CoreDNS                    healthy
+Flannel                    healthy
+Pod cross-node networking  healthy
+Linux SNAT/MASQUERADE      working
+MTU configuration          consistent
+conntrack                  not exhausted
+firewalld                  inactive
 ```
 
-### What is not proven
+Therefore the current evidence no longer supports describing the unique fault domain as VMware guest networking alone.
 
-No packet capture was obtained from the failing path.
+### Confirmed failure boundary
 
-Therefore the available evidence does not prove which specific component is defective.
+The most precise statement currently supported by evidence is:
 
-It is not currently valid to state that the unique root cause is:
+> Direct HTTPS connectivity toward GitHub is intermittently unreliable somewhere beyond the validated Kubernetes/guest SNAT path. The available evidence cannot uniquely distinguish the local upstream router, ISP/transit path, or GitHub edge.
 
-- VMnet8 itself
-- VMware NAT Service itself
-- Windows NetNat
-- a Windows firewall/filter driver
-- VPN software
-- another host networking component
+No single local component has been proven as the root cause.
 
-The most precise root-cause statement is:
+### Proxy comparison
 
-> Intermittent failure exists in the shared VMware guest outbound networking path. The failure boundary has been narrowed to the virtualized egress path between the VMware guests and the Windows host network, but the exact networking component has not yet been isolated.
+A separate HTTP proxy path was tested:
+
+```text
+http://192.168.88.1:7890
+```
+
+Validation results:
+
+```text
+worker2 HTTPS through proxy       10/10 PASS
+worker2 git ls-remote             10/10 PASS
+repo-server git ls-remote         10/10 PASS
+```
+
+All successful Git tests returned:
+
+```text
+3c5e7c088cc93402d4b947443738a342b0fe863d
+```
+
+This establishes a stable mitigation path without claiming that the original direct path has been repaired.
 
 ## Contributing Factors
 
@@ -317,19 +328,31 @@ The investigation did not find evidence supporting:
 
 ## Mitigation
 
-The repo-server Deployment was configured with:
+Two mitigations are now in place.
+
+### Git retry
+
+The repo-server keeps:
 
 ```text
 ARGOCD_GIT_ATTEMPTS_COUNT=3
 ```
 
-After the rollout, repo-server was able to successfully resolve the latest Git revision again.
+This remains a resilience control for transient failures.
 
-This is a resilience mitigation rather than a root-cause fix.
+### Repository-specific proxy
 
-It reduces the probability that one transient Git transport failure immediately causes repository reconciliation to fail.
+The Retail Git repository is configured through an Argo CD repository Secret with:
 
-It does not repair the underlying VMware guest networking fault.
+```text
+proxy: http://192.168.88.1:7890
+```
+
+This limits the workaround to the affected Git repository instead of setting a global proxy for the Kubernetes cluster or all Argo CD traffic.
+
+The proxy dependency is specific to this lab environment.
+
+No Git credentials are stored in this repository Secret.
 
 ## Recovery
 

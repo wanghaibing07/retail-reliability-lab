@@ -1,0 +1,10 @@
+captured_at=2026-09-23T17:13:07+08:00
+git_revision=3c5e7c088cc93402d4b947443738a342b0fe863d
+Client Version: v1.36.4
+Kustomize Version: v5.8.1
+Server Version: v1.36.4
+
+NAME          STATUS   ROLES           AGE   VERSION   INTERNAL-IP    EXTERNAL-IP   OS-IMAGE          KERNEL-VERSION                  CONTAINER-RUNTIME
+k8s-master    Ready    control-plane   13h   v1.36.4   192.168.88.3   <none>        CentOS Stream 9   5.14.0-511.el9.x86_64 (amd64)   containerd://2.3.4
+k8s-worker1   Ready    <none>          12h   v1.36.4   192.168.88.4   <none>        CentOS Stream 9   5.14.0-511.el9.x86_64 (amd64)   containerd://2.3.4
+k8s-worker2   Ready    <none>          12h   v1.36.4   192.168.88.5   <none>        CentOS Stream 9   5.14.0-511.el9.x86_64 (amd64)   containerd://2.3.4

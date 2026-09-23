@@ -1,0 +1,14 @@
+NAME     SYNC     HEALTH    REVISION
+retail   Synced   Healthy   3c5e7c088cc93402d4b947443738a342b0fe863d
+
+NAME                                                READY   STATUS    RESTARTS   AGE    IP            NODE          NOMINATED NODE   READINESS GATES
+argocd-application-controller-0                     1/1     Running   0          170m   10.244.2.9    k8s-worker2   <none>           <none>
+argocd-applicationset-controller-5959f79d67-kdq2g   1/1     Running   0          170m   10.244.2.8    k8s-worker2   <none>           <none>
+argocd-dex-server-6f84fd5569-fsg96                  1/1     Running   0          170m   10.244.1.11   k8s-worker1   <none>           <none>
+argocd-notifications-controller-5856884878-ngw9w    1/1     Running   0          170m   10.244.2.7    k8s-worker2   <none>           <none>
+argocd-redis-86846d5986-7lr2p                       1/1     Running   0          170m   10.244.1.9    k8s-worker1   <none>           <none>
+argocd-repo-server-64b5bcd689-zdc7n                 1/1     Running   0          32m    10.244.1.20   k8s-worker1   <none>           <none>
+argocd-server-8567f6cc96-trfqv                      1/1     Running   0          170m   10.244.1.10   k8s-worker1   <none>           <none>
+
+NAME          TYPE     LABEL
+retail-repo   Opaque   repository

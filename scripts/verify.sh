@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 KUSTOMIZE_DIR="${KUSTOMIZE_DIR:-${ROOT_DIR}/infra/apps/retail}"
 NAMESPACE="retail"
-TIMEOUT="${TIMEOUT:-300s}"
+TIMEOUT="${TIMEOUT:-600s}"
 UI_SERVICE="${UI_SERVICE:-ui}"
 
 EVIDENCE_DIR="${EVIDENCE_DIR:-${ROOT_DIR}/evidence}"
