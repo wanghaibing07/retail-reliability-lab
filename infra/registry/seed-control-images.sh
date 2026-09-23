@@ -20,15 +20,15 @@ push_image() {
   printf 'SEED_OK|%s|%s\n' "$source" "$destination"
 }
 
-push_image registry.aliyuncs.com/google_containers/coredns:v1.10.1 \
-  "$registry/google_containers/coredns:v1.10.1"
-push_image registry.aliyuncs.com/google_containers/etcd:3.5.9-0 \
-  "$registry/google_containers/etcd:3.5.9-0"
-push_image registry.aliyuncs.com/google_containers/kube-apiserver:v1.28.15 \
-  "$registry/google_containers/kube-apiserver:v1.28.15"
-push_image registry.aliyuncs.com/google_containers/kube-controller-manager:v1.28.15 \
-  "$registry/google_containers/kube-controller-manager:v1.28.15"
-push_image registry.aliyuncs.com/google_containers/kube-scheduler:v1.28.15 \
-  "$registry/google_containers/kube-scheduler:v1.28.15"
+push_image registry.aliyuncs.com/google_containers/coredns:v1.14.2 \
+  "$registry/google_containers/coredns:v1.14.2"
+push_image registry.aliyuncs.com/google_containers/etcd:3.6.8-0 \
+  "$registry/google_containers/etcd:3.6.8-0"
+push_image registry.aliyuncs.com/google_containers/kube-apiserver:v1.36.4 \
+  "$registry/google_containers/kube-apiserver:v1.36.4"
+push_image registry.aliyuncs.com/google_containers/kube-controller-manager:v1.36.4 \
+  "$registry/google_containers/kube-controller-manager:v1.36.4"
+push_image registry.aliyuncs.com/google_containers/kube-scheduler:v1.36.4 \
+  "$registry/google_containers/kube-scheduler:v1.36.4"
 
 printf 'SEED_CONTROL_COMPLETE\n'

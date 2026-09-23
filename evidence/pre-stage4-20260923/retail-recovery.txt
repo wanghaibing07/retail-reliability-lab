@@ -1,0 +1,50 @@
+NAME                              READY   STATUS    RESTARTS      AGE   IP            NODE          NOMINATED NODE   READINESS GATES
+carts-7488488586-bfg2x            1/1     Running   0             49m   10.244.1.15   k8s-worker1   <none>           <none>
+carts-dynamodb-6bd99dc5d5-wxpxv   1/1     Running   0             49m   10.244.2.16   k8s-worker2   <none>           <none>
+catalog-6547c69f76-kszk9          1/1     Running   6 (41m ago)   49m   10.244.2.15   k8s-worker2   <none>           <none>
+catalog-mysql-0                   1/1     Running   0             49m   10.244.1.17   k8s-worker1   <none>           <none>
+checkout-b6c9df4cc-drnm8          1/1     Running   0             49m   10.244.2.18   k8s-worker2   <none>           <none>
+checkout-redis-56bd4b9699-vmx49   1/1     Running   0             49m   10.244.2.14   k8s-worker2   <none>           <none>
+orders-67bd7459f9-tvlgb           1/1     Running   0             49m   10.244.1.16   k8s-worker1   <none>           <none>
+orders-postgresql-0               1/1     Running   0             49m   10.244.1.19   k8s-worker1   <none>           <none>
+orders-rabbitmq-0                 1/1     Running   0             49m   10.244.2.19   k8s-worker2   <none>           <none>
+ui-646d576cb4-dntgj               1/1     Running   0             49m   10.244.2.17   k8s-worker2   <none>           <none>
+ui-646d576cb4-qfpws               1/1     Running   0             49m   10.244.1.18   k8s-worker1   <none>           <none>
+
+NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/carts            1/1     1            1           49m
+deployment.apps/carts-dynamodb   1/1     1            1           49m
+deployment.apps/catalog          1/1     1            1           49m
+deployment.apps/checkout         1/1     1            1           49m
+deployment.apps/checkout-redis   1/1     1            1           49m
+deployment.apps/orders           1/1     1            1           49m
+deployment.apps/ui               2/2     2            2           49m
+
+NAME                                 READY   AGE
+statefulset.apps/catalog-mysql       1/1     49m
+statefulset.apps/orders-postgresql   1/1     49m
+statefulset.apps/orders-rabbitmq     1/1     49m
+
+NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)              AGE
+service/carts               ClusterIP   10.97.21.224     <none>        80/TCP               49m
+service/carts-dynamodb      ClusterIP   10.97.236.239    <none>        8000/TCP             49m
+service/catalog             ClusterIP   10.99.50.208     <none>        80/TCP               49m
+service/catalog-mysql       ClusterIP   10.100.255.57    <none>        3306/TCP             49m
+service/checkout            ClusterIP   10.96.87.179     <none>        80/TCP               49m
+service/checkout-redis      ClusterIP   10.100.23.253    <none>        6379/TCP             49m
+service/orders              ClusterIP   10.99.235.109    <none>        80/TCP               49m
+service/orders-postgresql   ClusterIP   10.108.88.238    <none>        5432/TCP             49m
+service/orders-rabbitmq     ClusterIP   10.107.110.117   <none>        5672/TCP,15672/TCP   49m
+service/ui                  NodePort    10.107.97.171    <none>        80:32065/TCP         49m
+
+NAME                      ADDRESSTYPE   PORTS        ENDPOINTS                 AGE
+carts-dynamodb-x7np6      IPv4          8000         10.244.2.16               49m
+carts-nzz8f               IPv4          8080         10.244.1.15               49m
+catalog-mysql-d9npz       IPv4          3306         10.244.1.17               49m
+catalog-qccd7             IPv4          8080         10.244.2.15               49m
+checkout-jfr2k            IPv4          8080         10.244.2.18               49m
+checkout-redis-rnrw9      IPv4          6379         10.244.2.14               49m
+orders-599pt              IPv4          8080         10.244.1.16               49m
+orders-postgresql-p8tzp   IPv4          5432         10.244.1.19               49m
+orders-rabbitmq-pbzs7     IPv4          5672,15672   10.244.2.19               49m
+ui-k2fsr                  IPv4          8080         10.244.1.18,10.244.2.17   49m

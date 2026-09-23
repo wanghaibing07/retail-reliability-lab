@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  proxy: aHR0cDovLzE5Mi4xNjguODguMTo3ODkw
+  type: Z2l0
+  url: aHR0cHM6Ly9naXRodWIuY29tL3dhbmdoYWliaW5nMDcvcmV0YWlsLXJlbGlhYmlsaXR5LWxhYi5naXQ=
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: retail-repo
+  namespace: argocd

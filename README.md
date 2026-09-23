@@ -222,8 +222,9 @@ Git main
 - Argo CD platform 与 Git desired state 无 drift
 - Incident #003 的 retry mitigation 已声明化
 
-Incident #003 的底层 VMware guest outbound 网络问题仍未定位到唯一组件，
-因此只声明为“部分缓解”，不宣称根因已经修复。
+Incident #003 在 Kubernetes 1.36.4 重建后再次复现并完成更深层网络排查。
+当前证据将故障边界定位为不稳定的 GitHub 直连外部路径，无法继续证明到唯一上游组件。
+Retail repository 已通过 Argo CD repository-specific proxy 获得稳定访问；该方案作为实验室环境 mitigation，不宣称修复了原始直连路径。
 
 详细记录：
 
@@ -231,6 +232,26 @@ Incident #003 的底层 VMware guest outbound 网络问题仍未定位到唯一�
 - [Incidents](docs/incidents/)
 - [Runbooks](docs/runbooks/)
 - [Decisions](docs/decisions/)
+
+## 当前实验室基线
+
+2026-09-23 完成一次完整 Kubernetes 重建恢复验证：
+
+```text
+Kubernetes 1.36.4
+containerd 2.3.4
+3/3 Nodes Ready
+Argo CD v3.5.2
+Retail Synced / Healthy
+verify.sh PASS
+business HTTP 200
+```
+
+这次验证从新的 control plane 开始，依次恢复网络、Registry、Storage、Argo CD 和 Retail GitOps desired state。
+
+详细决策记录：
+
+* [Kubernetes 1.36.4 Rebuild](docs/decisions/002-kubernetes-136-rebuild.md)
 
 ## 项目边界
 

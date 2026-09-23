@@ -48,10 +48,10 @@ push_image public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2 \
 # Worker and shared cluster images needed for a restart without upstream pulls.
 push_image docker.io/library/busybox:1.36.1 \
   "$registry/library/busybox:1.36.1"
-push_image registry.aliyuncs.com/google_containers/kube-proxy:v1.28.15 \
-  "$registry/google_containers/kube-proxy:v1.28.15"
-push_image registry.aliyuncs.com/google_containers/pause:3.9 \
-  "$registry/google_containers/pause:3.9"
+push_image registry.aliyuncs.com/google_containers/kube-proxy:v1.36.4 \
+  "$registry/google_containers/kube-proxy:v1.36.4"
+push_image registry.aliyuncs.com/google_containers/pause:3.10.2 \
+  "$registry/google_containers/pause:3.10.2"
 push_image ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel3 \
   "$registry/flannel-io/flannel-cni-plugin:v1.9.1-flannel3"
 push_image ghcr.io/flannel-io/flannel:v0.28.9 \

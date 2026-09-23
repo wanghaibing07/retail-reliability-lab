@@ -32,7 +32,7 @@ jobs:
 
       - name: Install kubectl
         run: |
-          curl -LO "https://dl.k8s.io/release/v1.28.2/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/release/v1.36.4/bin/linux/amd64/kubectl"
           sudo install -m 0755 kubectl /usr/local/bin/kubectl
           kubectl version --client
 
@@ -87,14 +87,14 @@ jobs:
           kubeconform \
             -strict \
             -summary \
-            -kubernetes-version 1.28.0 \
+            -kubernetes-version 1.36.4 \
             /tmp/retail-rendered.yaml
 
           kubeconform \
             -strict \
             -summary \
             -skip CustomResourceDefinition \
-            -kubernetes-version 1.28.0 \
+            -kubernetes-version 1.36.4 \
             /tmp/argocd-platform-rendered.yaml
 
       - name: Reject latest image tags
