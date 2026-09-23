@@ -6,13 +6,14 @@ Prometheus 的 `RetailUIProbeFailed` 已经能在本地评估，但尚无通知�
 
 由于仓库公开，SMTP 地址、发件邮箱、收件邮箱和授权码**不写入 Git**。部署前在 `observability` 命名空间手动创建 `alertmanager-config` Secret，其中键 `alertmanager.yml` 为路由与 SMTP 配置，键 `smtp_password` 为授权码原文。Deployment 将这两个键作为只读文件挂载；请不要把 Secret YAML、授权码或 SMTP 登录日志贴到讨论中。Secret 不由 Argo CD 管理，重新建集群时必须重新注入。
 
-以下仅为待填写模板，不能直接部署。具体 SMTP 主机、端口、TLS 模式和账号要求以实际邮箱服务商文档为准；587 通常使用 STARTTLS，465 通常使用隐式 TLS。不要关闭 TLS 来规避连接问题。
+以下模板适用于个人 `@163.com` 发件邮箱，仍须在本机填写实际发件与收件地址，并启用该邮箱的 SMTP 服务、生成客户端授权码。使用 `smtp.163.com:465` 和隐式 TLS；如果是网易企业邮箱，主机名与授权方式可能不同，不能套用此模板。不要关闭 TLS 来规避连接问题。
 
 ```yaml
 global:
-  smtp_smarthost: 'SMTP_HOST:587'
-  smtp_from: 'SENDER@example.invalid'
-  smtp_auth_username: 'SENDER@example.invalid'
+  smtp_smarthost: 'smtp.163.com:465'
+  smtp_force_implicit_tls: true
+  smtp_from: 'SENDER@163.com'
+  smtp_auth_username: 'SENDER@163.com'
   smtp_auth_password_file: /etc/alertmanager/smtp_password
   smtp_require_tls: true
 route:
