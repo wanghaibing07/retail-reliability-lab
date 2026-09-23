@@ -7,6 +7,8 @@ resources:
   - service.yaml
   - blackbox-deployment.yaml
   - blackbox-service.yaml
+  - alertmanager-deployment.yaml
+  - alertmanager-service.yaml
 
 configMapGenerator:
   - name: prometheus-config
