@@ -63,6 +63,10 @@ spec:
               mountPath: /etc/prometheus/prometheus.yml
               subPath: prometheus.yml
               readOnly: true
+            - name: config
+              mountPath: /etc/prometheus/alerts.yml
+              subPath: alerts.yml
+              readOnly: true
             - name: data
               mountPath: /prometheus
       volumes:

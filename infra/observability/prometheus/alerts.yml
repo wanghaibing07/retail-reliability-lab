@@ -1,0 +1,11 @@
+groups:
+  - name: retail-ui
+    rules:
+      - alert: RetailUIProbeFailed
+        expr: (probe_success{job="retail-ui-nodeport"} == 0) or (up{job="retail-ui-nodeport"} == 0) or absent(probe_success{job="retail-ui-nodeport"})
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Retail UI HTTP probe failed
+          description: The worker1 probe of worker2's Retail UI NodePort has failed or stopped reporting for at least 2 minutes. Check the probe target, blackbox exporter, and Retail UI service.

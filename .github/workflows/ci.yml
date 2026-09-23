@@ -41,6 +41,14 @@ jobs:
           cd infra/argocd/platform/vendor/argocd-v3.5.2
           sha256sum -c install.yaml.sha256
 
+      - name: Validate Prometheus alert rules
+        run: |
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "${GITHUB_WORKSPACE}/infra/observability/prometheus:/rules:ro" \
+            quay.io/prometheus/prometheus:v3.13.3 \
+            check rules /rules/alerts.yml
+
       - name: Render Kustomize manifests
         run: |
           kubectl kustomize infra/apps/retail \
