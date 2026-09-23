@@ -12,6 +12,7 @@ configMapGenerator:
   - name: prometheus-config
     files:
       - prometheus.yml
+      - alerts.yml
   - name: blackbox-config
     files:
       - blackbox.yml
