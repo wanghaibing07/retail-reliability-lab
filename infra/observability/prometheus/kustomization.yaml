@@ -5,8 +5,13 @@ namespace: observability
 resources:
   - deployment.yaml
   - service.yaml
+  - blackbox-deployment.yaml
+  - blackbox-service.yaml
 
 configMapGenerator:
   - name: prometheus-config
     files:
       - prometheus.yml
+  - name: blackbox-config
+    files:
+      - blackbox.yml
