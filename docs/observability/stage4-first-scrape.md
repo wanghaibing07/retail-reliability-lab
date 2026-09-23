@@ -45,4 +45,8 @@ bash infra/registry/seed-observability.sh
 
 下一批增加 repo-server 抓取任务。此前关于“repo-server 没有 metrics Service”的判断已由实测纠正：2026-09-24 01:01 CST，`argocd-repo-server` Service 以 `app.kubernetes.io/name=argocd-repo-server` 选择 Pod，已有 8084→8084 metrics 端口；01:03 通过 Service 请求 `/metrics` 成功，返回 `argocd_git_request_total` 与 `argocd_git_request_duration_seconds`。`argocd_git_fetch_fail_total` 在这次读取中未出现，不能将其缺席解释为已验证的零失败。新增 job 合入后仍需验证 `up{job="argocd-repo-server"} == 1` 和实际 Git 请求序列。UI 的 HTTP 200 探测只代表首页可达，不能替代下单事务或数据恢复验证。
 
+## repo-server 抓取验收
+
+2026-09-24 01:08 CST，刷新 `observability` Application 后 Argo CD 同步到 `4bac5f64ed9fcc513e0cc895aca823410d660eb9`。01:09 CST，Application Synced / Healthy，新 Prometheus Pod `prometheus-5bcc7bf444-s86k2` Ready、重启数 0。01:10 CST，`argocd_git_request_total{job="argocd-repo-server"}` 返回 2 条序列，当前值合计 65；计数器的绝对值不等于当前成功率。新 Pod 刚启动时查询 `up` 只返回了两项，01:12 CST 再查四个 job 全部为 1，Targets 页面全部显示 up、无错误。repo-server 抓取已通过；`argocd_git_fetch_fail_total` 尚未观测到，不能宣称 Git 故障检测已经验证。后续需结合真实故障记录验证失败指标与告警行为。
+
 如需中止本批，先暂停 `observability` Application 自动同步，再删除该 Application 和由本批清单管理的资源；`emptyDir` 内指标将丢失。不要触碰 `retail`、`argocd`、Registry 的有状态资源。
