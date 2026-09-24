@@ -18,7 +18,7 @@
 | Stage 1 | Reproducible Deploy | ✅ 完成 |
 | Stage 2 | CI Validation | ✅ 完成 |
 | Stage 3 | Argo CD / GitOps | ✅ 完成 |
-| Stage 4 | Observability | ⏳ Planned |
+| Stage 4 | Observability | 🔄 进行中 |
 | Stage 5 | Backup / Restore | ⏳ Planned |
 | Stage 6 | Release Failure & Recovery | ⏳ Planned |
 | Stage 7 | Performance / Capacity | ⏳ Planned |
@@ -252,6 +252,19 @@ business HTTP 200
 详细决策记录：
 
 * [Kubernetes 1.36.4 Rebuild](docs/decisions/002-kubernetes-136-rebuild.md)
+
+## Stage 4：可观测性（进行中）
+
+Prometheus 已采集自身、Argo CD 及跨节点 Retail UI HTTP 探测指标；
+`RetailUIProbeFailed` 已加载且正常态通过。Alertmanager 的独立测试告警已实际收到
+触发与 `RESOLVED` 邮件，验收记录见
+[邮件通知](docs/observability/stage4-email-notifications.md)。
+规则行为测试见 `tests/prometheus/`，告警处理见
+[UI 探测 Runbook](docs/runbooks/retail-ui-probe-alert.md)。
+
+接下来仍需验证探测指标实际变化驱动的触发与恢复邮件，补齐最小诊断信号、
+监控历史保留及阶段证据。当前 HTTP 200 探测只覆盖首页；单实例集群内监控
+不能监测整个实验室完全停机。
 
 ## 项目边界
 

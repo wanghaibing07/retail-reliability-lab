@@ -38,7 +38,7 @@ CI 检查新资源和脚本。合并后只需核对 Argo CD 状态、Alertmanage
 ## 上线验收记录（2026-09-24，UTC+08:00）
 
 - PR #30 合并提交：`696cd10b0e2375f2dfd0a1832bccab7b6498442c`；observability Application 与该提交一致，状态为 Synced / Healthy；Alertmanager Deployment 已完成 rollout。
-- Alertmanager v0.33.1 的 linux/amd64 镜像已推入内部 Registry，索引摘要为 `sha256:805cd1ba019080871a809d0a8f06f66d0bc891dcda315991b18a13d0379d7de7`，与 worker1 已拉取镜像的 repo digest 一致。worker1 的冷拉发生在入库之前，当时 Registry 日志查询没有命中；因此不把 worker1 经内部 Registry 冷拉列为已证实。
+- Alertmanager v0.33.1 的 linux/amd64 镜像已推入内部 Registry，索引摘要为 `sha256:805cd1ba019080871a809d0a8f06f66d0bc891dcda315991b18a13d0379d7de7`，与 worker1 已拉取镜像的 repo digest 一致。worker1 的一次拉取早于本轮明确记录的推送完成时间，当时 Registry 日志查询没有命中；无法据此排除更早的入库，也无法确认该次拉取的实际路径。
 - Prometheus `/api/v1/alertmanagers` 列出 active 目标 `alertmanager.observability.svc.cluster.local:9093`。
 - 独立测试告警 `Stage4MailPipelineTest` 通过 Alertmanager API 提交，收件箱收到触发邮件；向相同告警提交结束时间后返回 HTTP 200，收件箱收到标题含 `RESOLVED` 的恢复邮件。没有中断 Retail UI。
 - 此测试证实 Alertmanager 的 SMTP 发件与恢复通知；实际 `RetailUIProbeFailed` 规则未人为触发。真实邮箱地址和授权码未写入仓库；重建集群时仍需手动重建 Secret。
