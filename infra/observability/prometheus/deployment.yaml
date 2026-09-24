@@ -30,7 +30,8 @@ spec:
           args:
             - --config.file=/etc/prometheus/prometheus.yml
             - --storage.tsdb.path=/prometheus
-            - --storage.tsdb.retention.time=24h
+            - --storage.tsdb.retention.time=48h
+            - --storage.tsdb.retention.size=3GB
             - --web.listen-address=:9090
           ports:
             - name: http
@@ -74,5 +75,5 @@ spec:
           configMap:
             name: prometheus-config
         - name: data
-          emptyDir:
-            sizeLimit: 2Gi
+          persistentVolumeClaim:
+            claimName: prometheus-data
