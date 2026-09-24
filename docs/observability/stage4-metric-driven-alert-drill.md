@@ -16,11 +16,12 @@
 | 15:50:59 | [PR #34](https://github.com/wanghaibing07/retail-reliability-lab/pull/34) | 恢复提交 `4eb6cb445b232e67455f28b16c57ec64c8455854` 合并，接受码恢复为 200。Git 文件树与注入前相同。 |
 | 15:53:37 | 用户终端原始输出 | Argo 对齐 `4eb6cb4`、Synced/Healthy；`up=1`、`probe_success=1`；过去 15 分钟 `probe_success` 最小值 0，`ALERTS` 的 pending/firing 两阶段均可查到。 |
 | 约 15:55 前 | 用户收件确认 | 收到 `RetailUIProbeFailed` 的 firing 邮件；准确发件/收件时间未提供。 |
+| 恢复后，具体到达时间未提供 | 用户收件确认与规则状态 | 同一告警的邮件标题包含 `RESOLVED`；规则 `ok/inactive`。 |
 
-## 当前结论与待补证据
+## 验收结论
 
-- **已通过：**探测指标失败 → 规则 pending/firing → 经 Alertmanager 到邮件触发收件；Git 恢复后探测回到正常，生产配置无残留故障判据。
-- **待确认：**规则当前 `inactive` 的现场输出，以及标题明确包含 `RESOLVED` 的同一告警恢复邮件。独立测试告警的 RESOLVED 历史验收不能代替本次验证。
+- **已通过：**探测指标失败 → 规则 pending/firing → 经 Alertmanager 到触发邮件；Git 恢复 → 探测成功、规则 ok/inactive → 同一告警的 RESOLVED 邮件。触发和恢复收件均由用户在本次演练中确认。
+- **最终配置：**恢复提交合并后，Git 文件树与注入前相同；Argo 已在 15:53:37 到达恢复 revision。
 - **限制：**这是判据故障；没有测真实 UI 宕机、数据库交易、全集群失联通知或各分支同时失效。
 
-后续一旦收到恢复邮件并确认规则状态，补充这两条现场证据后关闭 S4-B；无需再次注入。
+本次结束后关闭 S4-B；不再注入同一故障。阶段 4 的资源、保留与诊断覆盖仍继续实施。
