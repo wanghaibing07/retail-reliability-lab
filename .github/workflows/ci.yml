@@ -43,35 +43,58 @@ jobs:
 
       - name: Validate Prometheus alert rules
         run: |
-          docker run --rm             --entrypoint /bin/promtool             -v "${GITHUB_WORKSPACE}/infra/observability/prometheus:/rules:ro"             quay.io/prometheus/prometheus:v3.13.3             check rules /rules/alerts.yml
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "${GITHUB_WORKSPACE}/infra/observability/prometheus:/rules:ro" \
+            quay.io/prometheus/prometheus:v3.13.3 \
+            check rules /rules/alerts.yml
 
       - name: Test Prometheus alert behavior
         run: |
-          docker run --rm             --entrypoint /bin/promtool             -v "${GITHUB_WORKSPACE}:/work:ro"             -w /work/tests/prometheus             quay.io/prometheus/prometheus:v3.13.3             test rules retail-ui-alerts.test.yml
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "${GITHUB_WORKSPACE}:/work:ro" \
+            -w /work/tests/prometheus \
+            quay.io/prometheus/prometheus:v3.13.3 \
+            test rules retail-ui-alerts.test.yml
 
-          docker run --rm             --entrypoint /bin/promtool             -v "${GITHUB_WORKSPACE}:/work:ro"             -w /work/tests/prometheus             quay.io/prometheus/prometheus:v3.13.3             test rules stage4-platform-alerts.test.yml
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "${GITHUB_WORKSPACE}:/work:ro" \
+            -w /work/tests/prometheus \
+            quay.io/prometheus/prometheus:v3.13.3 \
+            test rules stage4-platform-alerts.test.yml
 
       - name: Render Kustomize manifests
         run: |
-          kubectl kustomize infra/apps/retail             > /tmp/retail-rendered.yaml
+          kubectl kustomize infra/apps/retail \
+            > /tmp/retail-rendered.yaml
 
-          kubectl kustomize infra/argocd/platform             > /tmp/argocd-platform-rendered.yaml
+          kubectl kustomize infra/argocd/platform \
+            > /tmp/argocd-platform-rendered.yaml
 
-          kubectl kustomize infra/observability/prometheus             > /tmp/prometheus-rendered.yaml
+          kubectl kustomize infra/observability/prometheus \
+            > /tmp/prometheus-rendered.yaml
 
           test -s /tmp/retail-rendered.yaml
           test -s /tmp/argocd-platform-rendered.yaml
           test -s /tmp/prometheus-rendered.yaml
 
           echo "Retail resources:"
-          grep '^kind:' /tmp/retail-rendered.yaml             | sort             | uniq -c
+          grep '^kind:' /tmp/retail-rendered.yaml \
+            | sort \
+            | uniq -c
 
           echo "Argo CD platform resources:"
-          grep '^kind:' /tmp/argocd-platform-rendered.yaml             | sort             | uniq -c
+          grep '^kind:' /tmp/argocd-platform-rendered.yaml \
+            | sort \
+            | uniq -c
 
       - name: Install kubeconform
         run: |
-          curl -L             https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz             -o /tmp/kubeconform.tar.gz
+          curl -L \
+            https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz \
+            -o /tmp/kubeconform.tar.gz
 
           tar -xzf /tmp/kubeconform.tar.gz -C /tmp
           sudo install -m 0755 /tmp/kubeconform /usr/local/bin/kubeconform
@@ -89,11 +112,24 @@ jobs:
 
       - name: Validate rendered Kubernetes manifests
         run: |
-          kubeconform             -strict             -summary             -kubernetes-version 1.36.4             /tmp/retail-rendered.yaml
+          kubeconform \
+            -strict \
+            -summary \
+            -kubernetes-version 1.36.4 \
+            /tmp/retail-rendered.yaml
 
-          kubeconform             -strict             -summary             -skip CustomResourceDefinition             -kubernetes-version 1.36.4             /tmp/argocd-platform-rendered.yaml
+          kubeconform \
+            -strict \
+            -summary \
+            -skip CustomResourceDefinition \
+            -kubernetes-version 1.36.4 \
+            /tmp/argocd-platform-rendered.yaml
 
-          kubeconform             -strict             -summary             -kubernetes-version 1.36.4             /tmp/prometheus-rendered.yaml
+          kubeconform \
+            -strict \
+            -summary \
+            -kubernetes-version 1.36.4 \
+            /tmp/prometheus-rendered.yaml
 
       - name: Reject latest image tags
         run: |
