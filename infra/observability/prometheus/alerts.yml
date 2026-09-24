@@ -10,3 +10,35 @@ groups:
           summary: Retail UI HTTP probe failed
           description: The worker1 probe of worker2's Retail UI NodePort has failed or stopped reporting for at least 2 minutes. Check the probe target, blackbox exporter, and Retail UI service.
           runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/retail-ui-probe-alert.md
+
+  - name: stage4-platform
+    rules:
+      - alert: MonitoringTargetDown
+        expr: up{job=~"alertmanager|blackbox-exporter|kube-state-metrics|argocd-application-controller|argocd-server|argocd-repo-server"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Monitoring or GitOps target is down
+          description: Prometheus has been unable to scrape {{ $labels.job }} target {{ $labels.instance }} for at least 2 minutes. Check the target Pod, Service, Endpoint and network path before changing application configuration.
+          runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/stage4-platform-alerts.md
+
+      - alert: KubernetesNodeNotReady
+        expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Kubernetes node is not Ready
+          description: Node {{ $labels.node }} has not reported Ready=true for at least 5 minutes. Check node conditions, kubelet and the node network path.
+          runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/stage4-platform-alerts.md
+
+      - alert: ArgoApplicationUnhealthy
+        expr: (argocd_app_info{sync_status!="Synced"} == 1) or (argocd_app_info{health_status=~"Degraded|Missing|Unknown|Suspended"} == 1)
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Argo CD application is not in a stable desired state
+          description: Application {{ $labels.name }} has remained sync={{ $labels.sync_status }} health={{ $labels.health_status }} for at least 5 minutes. Inspect Argo CD conditions and the affected resources before changing desired state.
+          runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/stage4-platform-alerts.md

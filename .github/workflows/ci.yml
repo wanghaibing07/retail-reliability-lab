@@ -58,6 +58,13 @@ jobs:
             quay.io/prometheus/prometheus:v3.13.3 \
             test rules retail-ui-alerts.test.yml
 
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "${GITHUB_WORKSPACE}:/work:ro" \
+            -w /work/tests/prometheus \
+            quay.io/prometheus/prometheus:v3.13.3 \
+            test rules stage4-platform-alerts.test.yml
+
       - name: Render Kustomize manifests
         run: |
           kubectl kustomize infra/apps/retail \

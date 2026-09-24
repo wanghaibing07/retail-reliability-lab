@@ -1,0 +1,94 @@
+rule_files:
+  - ../../infra/observability/prometheus/alerts.yml
+evaluation_interval: 30s
+
+tests:
+  - name: healthy platform state does not alert
+    interval: 30s
+    input_series:
+      - series: 'up{job="blackbox-exporter",instance="blackbox-exporter.observability.svc.cluster.local:9115"}'
+        values: '1+0x12'
+      - series: 'up{job="alertmanager",instance="alertmanager.observability.svc.cluster.local:9093"}'
+        values: '1+0x12'
+      - series: 'up{job="kube-state-metrics",instance="kube-state-metrics.observability.svc.cluster.local:8080"}'
+        values: '1+0x12'
+      - series: 'kube_node_status_condition{node="k8s-worker1",condition="Ready",status="true"}'
+        values: '1+0x12'
+      - series: 'argocd_app_info{name="retail",namespace="argocd",sync_status="Synced",health_status="Healthy"}'
+        values: '1+0x12'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: MonitoringTargetDown
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: KubernetesNodeNotReady
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: ArgoApplicationUnhealthy
+        exp_alerts: []
+
+  - name: monitoring target down requires two minutes
+    interval: 30s
+    input_series:
+      - series: 'up{job="blackbox-exporter",instance="blackbox-exporter.observability.svc.cluster.local:9115"}'
+        values: '1 0+0x7'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: MonitoringTargetDown
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: MonitoringTargetDown
+        exp_alerts:
+          - exp_labels:
+              job: blackbox-exporter
+              instance: blackbox-exporter.observability.svc.cluster.local:9115
+              severity: warning
+            exp_annotations:
+              summary: Monitoring or GitOps target is down
+              description: Prometheus has been unable to scrape blackbox-exporter target blackbox-exporter.observability.svc.cluster.local:9115 for at least 2 minutes. Check the target Pod, Service, Endpoint and network path before changing application configuration.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/stage4-platform-alerts.md
+
+  - name: node not ready requires five minutes
+    interval: 30s
+    input_series:
+      - series: 'kube_node_status_condition{node="k8s-worker1",condition="Ready",status="true"}'
+        values: '1 0+0x12'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: KubernetesNodeNotReady
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: KubernetesNodeNotReady
+        exp_alerts:
+          - exp_labels:
+              node: k8s-worker1
+              condition: Ready
+              status: "true"
+              severity: warning
+            exp_annotations:
+              summary: Kubernetes node is not Ready
+              description: Node k8s-worker1 has not reported Ready=true for at least 5 minutes. Check node conditions, kubelet and the node network path.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/stage4-platform-alerts.md
+
+  - name: Argo application unhealthy requires five minutes
+    interval: 30s
+    input_series:
+      - series: 'argocd_app_info{name="retail",namespace="argocd",sync_status="OutOfSync",health_status="Healthy"}'
+        values: '1+0x12'
+    alert_rule_test:
+      - eval_time: 4m30s
+        alertname: ArgoApplicationUnhealthy
+        exp_alerts: []
+      - eval_time: 5m30s
+        alertname: ArgoApplicationUnhealthy
+        exp_alerts:
+          - exp_labels:
+              name: retail
+              namespace: argocd
+              sync_status: OutOfSync
+              health_status: Healthy
+              severity: warning
+            exp_annotations:
+              summary: Argo CD application is not in a stable desired state
+              description: Application retail has remained sync=OutOfSync health=Healthy for at least 5 minutes. Inspect Argo CD conditions and the affected resources before changing desired state.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/stage4-platform-alerts.md
