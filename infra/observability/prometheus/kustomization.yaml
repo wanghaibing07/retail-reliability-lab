@@ -10,6 +10,7 @@ resources:
   - blackbox-service.yaml
   - alertmanager-deployment.yaml
   - alertmanager-service.yaml
+  - kube-state-metrics.yaml
 
 configMapGenerator:
   - name: prometheus-config
