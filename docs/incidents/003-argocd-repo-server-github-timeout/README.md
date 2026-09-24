@@ -437,8 +437,8 @@ HTTP 200
 ```
 
 This closes the release action, but it does not close the network incident. The
-repo-server retry remains a mitigation, and the underlying VMware guest-egress
-fault still requires a separate infrastructure investigation.
+repo-server retry remains a mitigation, and the intermittently unreliable direct
+GitHub path still requires a separate network investigation.
 
 ### P1 — Monitor Argo repository access
 

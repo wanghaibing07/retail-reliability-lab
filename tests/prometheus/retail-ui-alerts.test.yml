@@ -1,0 +1,127 @@
+rule_files:
+  - ../../infra/observability/prometheus/alerts.yml
+evaluation_interval: 30s
+
+tests:
+  - name: healthy probe never alerts
+    interval: 30s
+    input_series:
+      - series: 'up{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1+0x8'
+      - series: 'probe_success{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1+0x8'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: RetailUIProbeFailed
+        exp_alerts: []
+
+  - name: transient failure does not reach firing
+    interval: 30s
+    input_series:
+      - series: 'up{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1+0x9'
+      - series: 'probe_success{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1 1 0 0 0 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: RetailUIProbeFailed
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: RetailUIProbeFailed
+        exp_alerts: []
+
+  - name: probe failure fires once then resolves
+    interval: 30s
+    input_series:
+      - series: 'up{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1+0x10'
+      - series: 'probe_success{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1 0 0 0 0 0 0 0 1 1 1'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: RetailUIProbeFailed
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: RetailUIProbeFailed
+        exp_alerts:
+          - exp_labels:
+              job: retail-ui-nodeport
+              instance: 'http://192.168.88.5:32065/'
+              severity: warning
+            exp_annotations:
+              summary: Retail UI HTTP probe failed
+              description: The worker1 probe of worker2's Retail UI NodePort has failed or stopped reporting for at least 2 minutes. Check the probe target, blackbox exporter, and Retail UI service.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/retail-ui-probe-alert.md
+      - eval_time: 4m30s
+        alertname: RetailUIProbeFailed
+        exp_alerts: []
+
+  - name: scrape down and missing probe produce one instance alert
+    interval: 30s
+    input_series:
+      - series: 'up{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1 0+0x6'
+      - series: 'probe_success{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1 stale'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: RetailUIProbeFailed
+        exp_alerts:
+          - exp_labels:
+              job: retail-ui-nodeport
+              instance: 'http://192.168.88.5:32065/'
+              severity: warning
+            exp_annotations:
+              summary: Retail UI HTTP probe failed
+              description: The worker1 probe of worker2's Retail UI NodePort has failed or stopped reporting for at least 2 minutes. Check the probe target, blackbox exporter, and Retail UI service.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/retail-ui-probe-alert.md
+
+  - name: missing probe with successful scrape produces one instance alert
+    interval: 30s
+    input_series:
+      - series: 'up{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1+0x7'
+      - series: 'probe_success{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '1 stale'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: RetailUIProbeFailed
+        exp_alerts:
+          - exp_labels:
+              job: retail-ui-nodeport
+              instance: 'http://192.168.88.5:32065/'
+              severity: warning
+            exp_annotations:
+              summary: Retail UI HTTP probe failed
+              description: The worker1 probe of worker2's Retail UI NodePort has failed or stopped reporting for at least 2 minutes. Check the probe target, blackbox exporter, and Retail UI service.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/retail-ui-probe-alert.md
+
+  - name: entirely missing job produces a single job alert
+    interval: 30s
+    input_series: []
+    alert_rule_test:
+      - eval_time: 2m30s
+        alertname: RetailUIProbeFailed
+        exp_alerts:
+          - exp_labels:
+              job: retail-ui-nodeport
+              severity: warning
+            exp_annotations:
+              summary: Retail UI HTTP probe failed
+              description: The worker1 probe of worker2's Retail UI NodePort has failed or stopped reporting for at least 2 minutes. Check the probe target, blackbox exporter, and Retail UI service.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/retail-ui-probe-alert.md
+
+  - name: brief startup gap does not fire
+    interval: 30s
+    input_series:
+      - series: 'up{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '_ _ 1+0x7'
+      - series: 'probe_success{job="retail-ui-nodeport",instance="http://192.168.88.5:32065/"}'
+        values: '_ _ 1+0x7'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: RetailUIProbeFailed
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: RetailUIProbeFailed
+        exp_alerts: []
