@@ -18,7 +18,7 @@
 | Stage 1 | Reproducible Deploy | ✅ 完成 |
 | Stage 2 | CI Validation | ✅ 完成 |
 | Stage 3 | Argo CD / GitOps | ✅ 完成 |
-| Stage 4 | Observability | 🔄 进行中 |
+| Stage 4 | Observability | ✅ 完成 |
 | Stage 5 | Backup / Restore | ⏳ Planned |
 | Stage 6 | Release Failure & Recovery | ⏳ Planned |
 | Stage 7 | Performance / Capacity | ⏳ Planned |
@@ -253,19 +253,50 @@ business HTTP 200
 
 * [Kubernetes 1.36.4 Rebuild](docs/decisions/002-kubernetes-136-rebuild.md)
 
-## Stage 4：可观测性（进行中）
+## Stage 4：可观测性（已完成）
 
-Prometheus 已采集自身、Argo CD 及跨节点 Retail UI HTTP 探测指标；
-`RetailUIProbeFailed` 已加载且正常态通过。Alertmanager 的独立测试告警已实际收到
-触发与 `RESOLVED` 邮件，验收记录见
-[邮件通知](docs/observability/stage4-email-notifications.md)与
-[指标驱动告警演练](docs/observability/stage4-metric-driven-alert-drill.md)。
-规则行为测试见 `tests/prometheus/`，告警处理见
-[UI 探测 Runbook](docs/runbooks/retail-ui-probe-alert.md)。
+Stage 4 已完成最小可观测与告警闭环：
 
-指标驱动的触发及恢复邮件已在一次受控判据演练中验收。接下来补齐最小诊断信号、
-监控历史保留及阶段证据。当前 HTTP 200 探测只覆盖首页；单实例集群内监控
-不能监测整个实验室完全停机。
+- Prometheus v3.13.3 持久化到 `local-path-retain` PVC，48h / 3GB retention
+- Blackbox Exporter 跨节点探测 Retail UI NodePort
+- Alertmanager 已真实验证 firing 与 resolved 邮件
+- kube-state-metrics 采集 Node、Pod、Deployment、StatefulSet 对象状态
+- Prometheus 当前监控 8 个 target
+- 4 条可行动告警：Retail UI、监控/GitOps target、Node Ready、Argo Application 状态
+- 告警规则具备 promtool 语法检查与时序行为测试
+- 保存四组诊断 PromQL：业务、GitOps、Node/Workload、监控自身
+- Prometheus PVC 已验证跨 Pod 替换保留历史样本
+- 最终 Retail / observability 均为 Synced / Healthy，8/8 targets up，4/4 alert rules health=ok / inactive
+
+自然观察期间真实捕获一次 repo-server GitHub `info/refs` EOF：
+Retail 短暂进入 `Sync=Unknown`，`ArgoApplicationUnhealthy` 进入 pending，
+随后仓库访问恢复且 Application 自动回到 Synced / Healthy。
+该异常未持续越过 5 分钟 firing 阈值。
+
+S4-E 的墙钟观察窗口超过 24h，但 Prometheus 在该窗口内重启过两次并存在历史采样空窗，
+因此项目**不声称连续 24h 无故障、99.9% 可用性或完整 SLO 达标**。
+这作为已知观测限制保留，而不是用缺失样本推断系统健康。
+
+Stage 4 仍明确保持以下边界：
+
+- Prometheus / Alertmanager 均非高可用部署
+- local-path-retain 不是跨节点复制存储
+- 集群内监控无法覆盖整个实验室完全停机
+- Retail UI HTTP 200 只验证首页入口，不代表完整交易链路
+- 当前未部署 node-exporter，不宣称具备节点 CPU/内存/磁盘连续时序指标
+- GitHub repo-server 外部访问仍存在间歇抖动历史
+
+完整封板证据：
+
+- [Stage 4 Closeout](docs/observability/stage4-closeout.md)
+- [Prometheus 持久化](docs/observability/stage4-prometheus-persistence.md)
+- [kube-state-metrics](docs/observability/stage4-kube-state-metrics.md)
+- [可行动告警](docs/observability/stage4-actionable-alerts.md)
+- [诊断 PromQL](docs/observability/stage4-diagnostic-queries.md)
+- [邮件通知](docs/observability/stage4-email-notifications.md)
+- [指标驱动告警演练](docs/observability/stage4-metric-driven-alert-drill.md)
+
+下一阶段：Stage 5 Backup / Restore。重点从“发现故障”转向“验证数据能否备份、恢复并证明完整”。
 
 ## 项目边界
 
