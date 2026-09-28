@@ -1,0 +1,12 @@
+backup_id=20260928T070335Z-9dc19d58
+original_database_node=k8s-worker1
+external_backup_host=k8s-master
+restore_node=k8s-worker2
+restore_pvc=orders-postgresql-restore-data
+restore_pv=pvc-def13718-be19-45e3-870f-ba0a52e1f339
+
+production_endpoint=
+orders-postgresql-0
+
+restore_endpoint=
+orders-postgresql-restore-s5

@@ -1,0 +1,8 @@
+{
+  "archive_nonempty": true,
+  "pg_restore_list": "passed",
+  "source_external_sha256_match": true,
+  "sha256": "e5a8f61b74cb300adcb10d34ec4cb458d11a6d4b7329e02d6b566005abd49e3c",
+  "restore_marker_order_id": "f160b51e-6c7d-4479-acc6-96cdcd7f83c0",
+  "note": "Archive readability/checksum validated. Marker presence inside the backup will be proven by isolated restore."
+}
