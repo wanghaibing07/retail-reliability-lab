@@ -5,6 +5,7 @@ namespace: retail
 
 resources:
   - ../../vendor
+  - resources/orders-postgresql-data.yaml
 
 patches:
   - path: patches/ui-replicas.yaml
@@ -14,3 +15,4 @@ patches:
   - path: patches/orders-rabbitmq-prune-confirm.yaml
   - path: patches/stage5-checkout-write-freeze.yaml
   - path: patches/stage5-orders-write-freeze.yaml
+  - path: patches/stage5-orders-postgresql-pvc-cutover.yaml
