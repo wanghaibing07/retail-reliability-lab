@@ -97,3 +97,23 @@ Do not commit:
 Stage 5 currently validates a manually created backup and restore.
 
 It does not establish a continuous backup schedule or a guaranteed RPO.
+
+
+## Final migration backup
+
+After Checkout and Orders were scaled to zero, the final migration backup was created while production PostgreSQL was still running on the original `emptyDir`.
+
+- backup ID: `20260928T085552Z-9dc19d58`
+- source Pod: `orders-postgresql-0`
+- original database node: `k8s-worker1`
+- external backup host: `k8s-master`
+- archive size: 6357 bytes
+- SHA256: `ed42fad85324f8cc682cb406d3a03a28943165cfc681726b59f7c7073d15d3dd`
+- duration: 6s
+- archive validation: PASS
+- external SHA256 match: PASS
+- pre-migration business marker remained present after backup
+
+This final backup was restored into `orders-postgresql-data` during the production PVC migration.
+
+The controlled experiment observed no loss of confirmed Orders records, but this does not establish a guaranteed continuous RPO.
