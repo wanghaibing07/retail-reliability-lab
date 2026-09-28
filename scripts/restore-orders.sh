@@ -116,7 +116,8 @@ echo "restore_pod  : ${NAMESPACE}/${RESTORE_POD}"
 echo "backup_sha256: ${LOCAL_SHA}"
 echo
 
-# shellcheck disable=SC2016 -- $1 expands inside the restore container.
+# Positional parameter intentionally expands inside the restore container.
+# shellcheck disable=SC2016
 kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" exec -i     "${RESTORE_POD}" -c postgresql --     sh -c 'cat > "$1"' sh "${REMOTE_FILE}" < "${BACKUP_FILE}"
 
 REMOTE_SHA="$(
@@ -130,7 +131,8 @@ REMOTE_SHA="$(
 kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" exec     "${RESTORE_POD}" -c postgresql --     pg_restore --list "${REMOTE_FILE}" >/dev/null ||
     fail "pg_restore cannot read copied archive"
 
-# shellcheck disable=SC2016 -- variables expand inside the PostgreSQL container.
+# Remote variables intentionally expand inside the PostgreSQL container.
+# shellcheck disable=SC2016
 PUBLIC_TABLES="$(
     kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" exec         "${RESTORE_POD}" -c postgresql --         sh -lc '
             psql -X -At                 -U "$POSTGRES_USER"                 -d "$POSTGRES_DB"                 -c "
@@ -149,7 +151,8 @@ START_NS="$(date +%s%N)"
 
 echo "restore_started_at=${RESTORE_STARTED_AT}" | tee "${LOG_FILE}"
 
-# shellcheck disable=SC2016 -- variables and $1 expand inside the PostgreSQL container.
+# Remote variables and positional parameter intentionally expand inside the container.
+# shellcheck disable=SC2016
 if ! kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" exec     "${RESTORE_POD}" -c postgresql --     sh -lc '
         pg_restore             --verbose             --exit-on-error             --single-transaction             --no-owner             --no-acl             -U "$POSTGRES_USER"             -d "$POSTGRES_DB"             "$1"
     ' sh "${REMOTE_FILE}" 2>&1 | tee -a "${LOG_FILE}"; then
