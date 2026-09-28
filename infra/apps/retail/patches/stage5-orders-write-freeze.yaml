@@ -3,4 +3,4 @@ kind: Deployment
 metadata:
   name: orders
 spec:
-  replicas: 0
+  replicas: 1
