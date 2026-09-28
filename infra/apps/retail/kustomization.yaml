@@ -12,3 +12,5 @@ patches:
   - path: patches/catalog-mysql-prune-confirm.yaml
   - path: patches/orders-postgresql-prune-confirm.yaml
   - path: patches/orders-rabbitmq-prune-confirm.yaml
+  - path: patches/stage5-checkout-write-freeze.yaml
+  - path: patches/stage5-orders-write-freeze.yaml
