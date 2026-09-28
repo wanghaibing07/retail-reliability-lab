@@ -1,0 +1,3 @@
+order_id=f160b51e-6c7d-4479-acc6-96cdcd7f83c0
+created_date=2026-09-28T06:48:30.843953
+item_count=1

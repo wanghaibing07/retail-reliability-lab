@@ -1,0 +1,29 @@
+;
+; Archive created at 2026-09-28 07:03:35 UTC
+;     dbname: orders
+;     TOC Entries: 18
+;     Compression: gzip
+;     Dump Version: 1.15-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 16.1 (Debian 16.1-1.pgdg120+1)
+;     Dumped by pg_dump version: 16.1 (Debian 16.1-1.pgdg120+1)
+;
+;
+; Selected TOC Entries:
+;
+215; 1259 16385 TABLE public flyway_schema_history orders
+217; 1259 16399 TABLE public order_items orders
+216; 1259 16394 TABLE public orders orders
+218; 1259 16409 TABLE public shipping_addresses orders
+3367; 0 16385 TABLE DATA public flyway_schema_history orders
+3369; 0 16399 TABLE DATA public order_items orders
+3368; 0 16394 TABLE DATA public orders orders
+3370; 0 16409 TABLE DATA public shipping_addresses orders
+3216; 2606 16392 CONSTRAINT public flyway_schema_history flyway_schema_history_pk orders
+3219; 2606 16398 CONSTRAINT public orders orders_pkey orders
+3221; 2606 16415 CONSTRAINT public shipping_addresses shipping_addresses_pkey orders
+3217; 1259 16393 INDEX public flyway_schema_history_s_idx orders
+3222; 2606 16404 FK CONSTRAINT public order_items order_items_order_id_fkey orders
+3223; 2606 16416 FK CONSTRAINT public shipping_addresses shipping_addresses_order_id_fkey orders

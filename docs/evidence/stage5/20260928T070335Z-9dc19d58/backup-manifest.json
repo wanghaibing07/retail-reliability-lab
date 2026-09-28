@@ -1,0 +1,20 @@
+{
+  "backup_id": "20260928T070335Z-9dc19d58",
+  "started_at": "2026-09-28T07:03:35Z",
+  "completed_at": "2026-09-28T07:03:39Z",
+  "duration_seconds": 4,
+  "git_sha": "395f28eaf61cee2656314502dfc7afac0c6bb53f",
+  "source_pod": "orders-postgresql-0",
+  "source_pod_uid": "9dc19d58-1d08-405f-aef3-d868530c7950",
+  "source_node": "k8s-worker1",
+  "postgres_version": "16.1 (Debian 16.1-1.pgdg120+1)",
+  "image": "public.ecr.aws/docker/library/postgres:16.1",
+  "image_digest": "public.ecr.aws/docker/library/postgres@sha256:09f23e02d76670d3b346a3c00aa33a27cf57aab8341eedfcdaed41459d14f5c4",
+  "database": "orders",
+  "dump_format": "custom",
+  "file_size": 6357,
+  "sha256": "e5a8f61b74cb300adcb10d34ec4cb458d11a6d4b7329e02d6b566005abd49e3c",
+  "external_copy_location": "/home/k8sadmin/retail-backups/orders/20260928T070335Z-9dc19d58/orders-20260928T070335Z-9dc19d58.dump",
+  "failure_domain": "k8s-master VM; separate VMware guest from source database VM; same underlying VMware host",
+  "validation_status": "passed"
+}
