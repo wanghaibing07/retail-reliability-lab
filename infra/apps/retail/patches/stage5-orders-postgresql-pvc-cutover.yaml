@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: orders-postgresql
+spec:
+  replicas: 0
+  template:
+    spec:
+      volumes:
+        - name: data
+          emptyDir: null
+          persistentVolumeClaim:
+            claimName: orders-postgresql-data
