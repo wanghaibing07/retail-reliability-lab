@@ -19,7 +19,7 @@
 | Stage 2 | CI Validation | ✅ 完成 |
 | Stage 3 | Argo CD / GitOps | ✅ 完成 |
 | Stage 4 | Observability | ✅ 完成 |
-| Stage 5 | Backup / Restore | ⏳ Planned |
+| Stage 5 | Backup / Restore | ✅ 完成 |
 | Stage 6 | Release Failure & Recovery | ⏳ Planned |
 | Stage 7 | Performance / Capacity | ⏳ Planned |
 | Stage 8 | Portfolio / Interview Packaging | ⏳ Planned |
@@ -172,6 +172,8 @@ retail-reliability-lab/
 │   ├── prepull-images.sh
 │   ├── deploy.sh
 │   ├── verify.sh
+│   ├── backup-orders.sh
+│   ├── restore-orders.sh
 │   └── destroy.sh
 └── README.md
 ```
@@ -296,7 +298,56 @@ Stage 4 仍明确保持以下边界：
 - [邮件通知](docs/observability/stage4-email-notifications.md)
 - [指标驱动告警演练](docs/observability/stage4-metric-driven-alert-drill.md)
 
-下一阶段：Stage 5 Backup / Restore。重点从“发现故障”转向“验证数据能否备份、恢复并证明完整”。
+Stage 4 已封板，后续恢复能力由 Stage 5 验证。
+
+
+## Stage 5：Backup / Restore（已完成）
+
+Stage 5 聚焦 Orders PostgreSQL，完成从临时 `emptyDir` 到 retained PVC 的可验证迁移与恢复闭环：
+
+- 使用 `pg_dump -Fc` 生成 PostgreSQL 逻辑备份
+- 备份先写 `.partial`，通过非空、`pg_restore --list`、SHA256 后才发布正式归档
+- 备份副本离开原数据库 VM：`k8s-worker1 → k8s-master`
+- 在 `k8s-worker2` 隔离 PostgreSQL 中真实执行 `pg_restore`
+- 数据库层与 Orders 1.6.2 应用层均验证恢复 marker
+- 在维护窗口冻结 Checkout / Orders 写入后创建 final backup
+- 生产 `orders-postgresql` 从 `emptyDir` 迁移到 `orders-postgresql-data`
+- PVC：4Gi / RWO / `local-path-retain` / PV reclaimPolicy=Retain
+- final backup 恢复到生产 PVC 后，由正式 StatefulSet 接管
+- 迁移前订单与迁移后新订单均通过 PostgreSQL 和 Orders API 验证
+- 主动删除并重建 `orders-postgresql-0`，两个订单均保留
+
+关键实测：
+
+```text
+isolated restore -> application validation : 81.285s
+production PVC pg_restore                 : 0.365s
+final backup                              : 6s
+```
+
+本次受控实验中未观察到已确认 Orders 记录丢失。
+
+Stage 5 只证明：
+
+> 已验证 Orders PostgreSQL 数据库的备份、持久化和隔离恢复能力。
+
+不宣称：
+
+- 整个 Retail 的分布式一致性灾备
+- worker2 节点丢失后的跨节点存储自动故障转移
+- 异地 / off-site backup
+- 持续备份或保证 RPO=0
+- 保证生产 RTO
+
+完整记录：
+
+- [Stage 5 Closeout](docs/backup/stage5-closeout.md)
+- [Orders PostgreSQL Backup](docs/backup/orders-postgresql.md)
+- [Orders PostgreSQL Restore Runbook](docs/runbooks/orders-postgresql-restore.md)
+- [Orders PostgreSQL PVC Migration Runbook](docs/runbooks/orders-postgresql-pvc-migration.md)
+- [Stage 5 Evidence](docs/evidence/stage5/)
+
+下一阶段：Stage 6 Release Failure & Recovery。
 
 ## 项目边界
 

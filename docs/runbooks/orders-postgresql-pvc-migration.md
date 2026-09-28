@@ -187,3 +187,41 @@ After Phase 3, the old emptyDir is gone. Rollback is backup-based:
 5. validate the marker before resuming applications
 
 Never delete the last valid external backup during the migration.
+
+
+## Accepted execution result
+
+The runbook was executed successfully on 2026-09-28.
+
+Final production state:
+
+- PostgreSQL: `orders-postgresql-0`
+- node: `k8s-worker2`
+- PVC: `orders-postgresql-data`
+- PV: `pvc-0dd9ab31-7885-495e-9864-2665898491a1`
+- capacity: 4Gi
+- StorageClass: `local-path-retain`
+- reclaim policy: Retain
+- pre-migration marker: PASS
+- post-migration order: PASS
+- Orders API read validation: PASS
+- post-migration write validation: PASS
+- Pod replacement persistence validation: PASS
+
+Final backup:
+
+- ID: `20260928T085552Z-9dc19d58`
+- SHA256: `ed42fad85324f8cc682cb406d3a03a28943165cfc681726b59f7c7073d15d3dd`
+
+Post-migration order:
+
+- `9614fdec-30f6-4b27-8fa4-239105720f62`
+
+Controlled Pod replacement:
+
+- old UID: `4bf2b73d-2494-480f-af9b-e8dddd64fc3d`
+- new UID: `7b12b5bd-7d7e-401f-a118-2f675a2cbb25`
+- same PVC remounted: PASS
+- old and new Orders records survived: PASS
+
+This validates Pod-level persistence. It does not validate loss of the `k8s-worker2` node or cross-node storage failover.
