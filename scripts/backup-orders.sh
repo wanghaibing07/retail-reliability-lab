@@ -49,10 +49,12 @@ IMAGE_ID="$(
     kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" get pod "${SOURCE_POD}"         -o jsonpath='{.status.containerStatuses[?(@.name=="postgresql")].imageID}'
 )"
 
+# shellcheck disable=SC2016 -- variables expand inside the PostgreSQL container.
 PG_VERSION="$(
     kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" exec         "${SOURCE_POD}" -c postgresql --         sh -lc 'psql -X -At -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SHOW server_version;"'
 )"
 
+# shellcheck disable=SC2016 -- variables expand inside the PostgreSQL container.
 DB_NAME="$(
     kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" exec         "${SOURCE_POD}" -c postgresql --         sh -lc 'printf "%s" "$POSTGRES_DB"'
 )"
@@ -94,6 +96,7 @@ echo "original_database_node: ${SOURCE_NODE}"
 echo "external_backup_host  : $(hostname)"
 echo
 
+# shellcheck disable=SC2016 -- variables expand inside the PostgreSQL container.
 kubectl --kubeconfig="${KUBECONFIG}" -n "${NAMESPACE}" exec     "${SOURCE_POD}" -c postgresql --     sh -lc '
         pg_dump             -U "$POSTGRES_USER"             -d "$POSTGRES_DB"             -Fc             -f "$1"
     ' sh "${REMOTE_PARTIAL}" 2>>"${LOG}"
