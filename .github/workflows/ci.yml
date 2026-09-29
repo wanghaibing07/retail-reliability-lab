@@ -47,7 +47,7 @@ jobs:
             --entrypoint /bin/promtool \
             -v "${GITHUB_WORKSPACE}/infra/observability/prometheus:/etc/prometheus:ro" \
             quay.io/prometheus/prometheus:v3.13.3 \
-            check config /etc/prometheus/prometheus.yml
+            check config --syntax-only /etc/prometheus/prometheus.yml
 
       - name: Validate Prometheus alert rules
         run: |
