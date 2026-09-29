@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: observability
 
 resources:
+  - prometheus-rbac.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml

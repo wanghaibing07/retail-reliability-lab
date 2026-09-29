@@ -41,6 +41,14 @@ jobs:
           cd infra/argocd/platform/vendor/argocd-v3.5.2
           sha256sum -c install.yaml.sha256
 
+      - name: Validate Prometheus configuration
+        run: |
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "${GITHUB_WORKSPACE}/infra/observability/prometheus:/etc/prometheus:ro" \
+            quay.io/prometheus/prometheus:v3.13.3 \
+            check config /etc/prometheus/prometheus.yml
+
       - name: Validate Prometheus alert rules
         run: |
           docker run --rm \
