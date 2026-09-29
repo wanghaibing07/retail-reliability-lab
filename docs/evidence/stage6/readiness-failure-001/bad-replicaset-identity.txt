@@ -1,0 +1,3 @@
+BAD_RS=ui-bf4cfc995
+NAME           DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES                                                       SELECTOR
+ui-bf4cfc995   1         1         0       10m   ui           public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2   app.kubernetes.io/component=service,app.kubernetes.io/instance=ui,app.kubernetes.io/name=ui,app.kubernetes.io/owner=retail-store-sample,pod-template-hash=bf4cfc995

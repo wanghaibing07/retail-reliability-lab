@@ -1,0 +1,2 @@
+NAME   READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS   IMAGES                                                       SELECTOR
+ui     2/2     2            2           5d23h   ui           public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2   app.kubernetes.io/component=service,app.kubernetes.io/instance=ui,app.kubernetes.io/name=ui,app.kubernetes.io/owner=retail-store-sample

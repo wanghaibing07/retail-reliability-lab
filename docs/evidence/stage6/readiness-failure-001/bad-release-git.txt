@@ -1,0 +1,4 @@
+BAD_MERGE_SHA=ba058deadec602ae0392ab8a42cb2c72fa13061d
+commit=ba058deadec602ae0392ab8a42cb2c72fa13061d
+committed_at=2026-09-29T15:34:36+08:00
+subject=Merge pull request #50 from wanghaibing07/feat/stage6-ui-readiness-failure

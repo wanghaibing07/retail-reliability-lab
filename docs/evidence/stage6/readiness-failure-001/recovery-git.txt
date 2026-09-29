@@ -1,0 +1,4 @@
+recovery_merge_sha=9cae7211894947f6a780fcac9678121255e675a0
+recovery_merged_observed_at=2026-09-29T08:09:21Z
+subject=Merge pull request #51 from wanghaibing07/fix/stage6-recover-readiness
+committed_at=2026-09-29T16:09:11+08:00

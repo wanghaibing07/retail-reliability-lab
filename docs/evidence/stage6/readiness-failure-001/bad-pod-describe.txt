@@ -1,0 +1,77 @@
+Name:             ui-bf4cfc995-5mxkw
+Namespace:        retail
+Priority:         0
+Service Account:  ui
+Node:             k8s-worker2/192.168.88.5
+Start Time:       Tue, 29 Sep 2026 15:39:39 +0800
+Labels:           app.kubernetes.io/component=service
+                  app.kubernetes.io/instance=ui
+                  app.kubernetes.io/name=ui
+                  app.kubernetes.io/owner=retail-store-sample
+                  pod-template-hash=bf4cfc995
+Annotations:      prometheus.io/path: /actuator/prometheus
+                  prometheus.io/port: 8080
+                  prometheus.io/scrape: true
+Status:           Running
+IP:               10.244.2.104
+IPs:
+  IP:           10.244.2.104
+Controlled By:  ReplicaSet/ui-bf4cfc995
+Containers:
+  ui:
+    Container ID:   containerd://e77221ba1e19c81099687041b1ccddf1752f371439c5a2924945d0a8b27aa5f6
+    Image:          public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2
+    Image ID:       public.ecr.aws/aws-containers/retail-store-sample-ui@sha256:489421be17ec24f7d89cf603b8519fb78711b323b63c723f8be833a07bdf7206
+    Port:           8080/TCP (http)
+    Host Port:      0/TCP (http)
+    State:          Running
+      Started:      Tue, 29 Sep 2026 15:39:43 +0800
+    Ready:          False
+    Restart Count:  0
+    Limits:
+      memory:  512Mi
+    Requests:
+      cpu:      128m
+      memory:   512Mi
+    Readiness:  http-get http://:8080/stage6-intentional-readiness-failure delay=10s timeout=1s period=10s #success=1 #failure=3
+    Environment Variables from:
+      ui  ConfigMap  Optional: false
+    Environment:
+      JAVA_OPTS:                      -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/urandom
+      METADATA_KUBERNETES_POD_NAME:   ui-bf4cfc995-5mxkw (v1:metadata.name)
+      METADATA_KUBERNETES_NAMESPACE:  retail (v1:metadata.namespace)
+      METADATA_KUBERNETES_NODE_NAME:   (v1:spec.nodeName)
+    Mounts:
+      /tmp from tmp-volume (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-788sz (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       False
+  ContainersReady             False
+  PodScheduled                True
+Volumes:
+  tmp-volume:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     Memory
+    SizeLimit:  <unset>
+  kube-api-access-788sz:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  10m                   default-scheduler  Successfully assigned retail/ui-bf4cfc995-5mxkw to k8s-worker2
+  Normal   Pulled     10m                   kubelet            spec.containers{ui}: Container image "public.ecr.aws/aws-containers/retail-store-sample-ui:1.6.2" already present on machine and can be accessed by the pod
+  Normal   Created    10m                   kubelet            spec.containers{ui}: Container created
+  Normal   Started    10m                   kubelet            spec.containers{ui}: Container started
+  Warning  Unhealthy  9m53s (x3 over 10m)   kubelet            spec.containers{ui}: Readiness probe failed: Get "http://10.244.2.104:8080/stage6-intentional-readiness-failure": dial tcp 10.244.2.104:8080: connect: connection refused
+  Warning  Unhealthy  11s (x62 over 9m43s)  kubelet            spec.containers{ui}: Readiness probe failed: HTTP probe failed with statuscode: 404

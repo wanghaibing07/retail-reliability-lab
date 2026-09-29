@@ -1,0 +1,3 @@
+NAME                  READY   STATUS    RESTARTS      AGE     IP             NODE          NOMINATED NODE   READINESS GATES
+ui-646d576cb4-w5vmr   1/1     Running   4 (25h ago)   4d21h   10.244.1.152   k8s-worker1   <none>           <none>
+ui-646d576cb4-x6jlw   1/1     Running   4 (25h ago)   4d21h   10.244.1.153   k8s-worker1   <none>           <none>
