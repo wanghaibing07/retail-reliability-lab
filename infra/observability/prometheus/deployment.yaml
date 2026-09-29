@@ -16,6 +16,7 @@ spec:
       labels:
         app.kubernetes.io/name: prometheus
     spec:
+      serviceAccountName: prometheus
       nodeSelector:
         kubernetes.io/hostname: k8s-worker2
       securityContext:

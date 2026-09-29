@@ -6,6 +6,7 @@ namespace: retail
 resources:
   - ../../vendor
   - resources/orders-postgresql-data.yaml
+  - resources/prometheus-pod-discovery-rbac.yaml
 
 patches:
   - path: patches/ui-replicas.yaml
