@@ -1,0 +1,40 @@
+rule_files:
+  - ../../infra/observability/prometheus/alerts.yml
+
+evaluation_interval: 30s
+
+tests:
+  - name: healthy completed rollout does not alert
+    interval: 30s
+    input_series:
+      - series: 'kube_deployment_status_condition{namespace="retail",deployment="ui",condition="Progressing",status="true",reason="NewReplicaSetAvailable"}'
+        values: '1+0x4'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: KubernetesDeploymentRolloutStalled
+        exp_alerts: []
+
+  - name: progress deadline exceeded fires and clears
+    interval: 30s
+    input_series:
+      - series: 'kube_deployment_status_condition{namespace="retail",deployment="ui",condition="Progressing",status="false",reason="ProgressDeadlineExceeded"}'
+        values: '0 1 1 0 0'
+    alert_rule_test:
+      - eval_time: 30s
+        alertname: KubernetesDeploymentRolloutStalled
+        exp_alerts:
+          - exp_labels:
+              namespace: retail
+              deployment: ui
+              condition: Progressing
+              status: "false"
+              reason: ProgressDeadlineExceeded
+              severity: warning
+            exp_annotations:
+              summary: Kubernetes Deployment rollout stalled
+              description: Deployment retail/ui exceeded its Kubernetes progress deadline. Inspect the ReplicaSet, Pod readiness and events, then recover the desired state through Git.
+              runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/release-failure-recovery.md
+
+      - eval_time: 1m30s
+        alertname: KubernetesDeploymentRolloutStalled
+        exp_alerts: []

@@ -42,3 +42,14 @@ groups:
           summary: Argo CD application is not in a stable desired state
           description: Application {{ $labels.name }} has remained sync={{ $labels.sync_status }} health={{ $labels.health_status }} for at least 5 minutes. Inspect Argo CD conditions and the affected resources before changing desired state.
           runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/stage4-platform-alerts.md
+
+  - name: stage6-release
+    rules:
+      - alert: KubernetesDeploymentRolloutStalled
+        expr: kube_deployment_status_condition{namespace="retail",condition="Progressing",status="false",reason="ProgressDeadlineExceeded"} == 1
+        labels:
+          severity: warning
+        annotations:
+          summary: Kubernetes Deployment rollout stalled
+          description: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} exceeded its Kubernetes progress deadline. Inspect the ReplicaSet, Pod readiness and events, then recover the desired state through Git.
+          runbook_url: https://github.com/wanghaibing07/retail-reliability-lab/blob/main/docs/runbooks/release-failure-recovery.md
