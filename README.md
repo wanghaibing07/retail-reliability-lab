@@ -20,7 +20,7 @@
 | Stage 3 | Argo CD / GitOps | ✅ 完成 |
 | Stage 4 | Observability | ✅ 完成 |
 | Stage 5 | Backup / Restore | ✅ 完成 |
-| Stage 6 | Release Failure & Recovery | ⏳ Planned |
+| Stage 6 | Release Failure & Recovery | ✅ 完成 |
 | Stage 7 | Performance / Capacity | ⏳ Planned |
 | Stage 8 | Portfolio / Interview Packaging | ⏳ Planned |
 
@@ -348,6 +348,97 @@ Stage 5 只证明：
 - [Stage 5 Evidence](docs/evidence/stage5/)
 
 下一阶段：Stage 6 Release Failure & Recovery。
+
+## Stage 6：Release Failure & Recovery（已完成）
+
+Stage 6 已完成一次受控 UI 发布失败与 GitOps 恢复闭环。
+
+长期保留的 release safety：
+
+- UI `replicas=2`
+- `progressDeadlineSeconds=120`
+- `maxUnavailable=0`
+- `maxSurge=1`
+- `KubernetesDeploymentRolloutStalled` 发布停滞告警
+
+受控实验故意将 UI readiness path 从：
+
+```text
+/actuator/health/readiness
+```
+
+改为不存在的路径，使一个通过静态 CI 的合法 Kubernetes 变更在运行时产生真实 rollout failure。
+
+实测链路：
+
+```text
+PR / CI PASS
+      ↓
+Git merge
+      ↓
+Argo CD reconciliation
+      ↓
+new UI Pod Running / NotReady
+      ↓
+bad endpoint ready=false
+      ↓
+old 2 healthy replicas continue serving
+      ↓
+ProgressDeadlineExceeded
+      ↓
+KubernetesDeploymentRolloutStalled firing
+      ↓
+Git revert PR / CI PASS
+      ↓
+Argo CD reconciliation
+      ↓
+UI Healthy
+      ↓
+alert cleared
+      ↓
+verify.sh PASS
+```
+
+关键观测：
+
+- 坏版本：`ba058deadec602ae0392ab8a42cb2c72fa13061d`
+- 恢复版本：`9cae7211894947f6a780fcac9678121255e675a0`
+- Argo 开始同步坏版本后约 `2m02s` 观察到 `ProgressDeadlineExceeded`
+- 失败期间旧 UI replicas 保持 Ready
+- 采集到的用户入口请求持续返回 HTTP 200
+- recovery merge 后 `41s` 观察到 Argo 恢复 Healthy
+- 最终 `verify.sh` PASS
+
+正式 recovery 没有使用 `kubectl rollout undo`、live patch 或手工修改线上对象，而是：
+
+```text
+bad Git merge
+→ git revert
+→ recovery PR
+→ CI
+→ merge
+→ Argo CD reconciliation
+```
+
+因此 Stage 6 验证的是：
+
+> 在当前 Kubernetes + Argo CD GitOps 环境中，一次受控 UI 发布失败能够被检测、限制影响范围，并通过可审计的 Git desired-state 恢复。
+
+本阶段不宣称：
+
+- 已实现自动 rollback
+- 已实现 Canary / Blue-Green
+- 所有业务语义错误都能被 readiness 检测
+- 已证明生产零停机
+- 所有 Retail 服务都具备相同 release safety
+
+完整记录：
+
+- [Stage 6 Closeout](docs/releases/stage6-closeout.md)
+- [Release Failure Recovery Runbook](docs/runbooks/release-failure-recovery.md)
+- [Stage 6 Evidence](docs/evidence/stage6/readiness-failure-001/)
+
+下一阶段：Stage 7 Performance / Capacity。
 
 ## 项目边界
 

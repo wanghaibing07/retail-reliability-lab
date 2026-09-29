@@ -1,0 +1,3 @@
+pod=ui-646d576cb4-w5vmr addresses=["10.244.1.152"] ready=true
+pod=ui-646d576cb4-x6jlw addresses=["10.244.1.153"] ready=true
+pod=ui-bf4cfc995-5mxkw addresses=["10.244.2.104"] ready=false

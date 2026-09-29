@@ -1,0 +1,7 @@
+BAD_POD=ui-bf4cfc995-5mxkw
+name=ui-bf4cfc995-5mxkw
+phase=Running
+ready=false
+node=k8s-worker2
+podIP=10.244.2.104
+readinessPath=/stage6-intentional-readiness-failure
