@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: stage7-browse-smoke
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 120
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stage7-load-generator
+        app.kubernetes.io/component: performance-test
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 10
+
+      nodeSelector:
+        kubernetes.io/hostname: k8s-master
+
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      containers:
+        - name: artillery
+          image: artilleryio/artillery:2.0.22
+          imagePullPolicy: IfNotPresent
+
+          args:
+            - run
+            - -t
+            - http://ui.retail.svc.cluster.local:80
+            - --output
+            - /results/output.json
+            - --overrides
+            - '{"config":{"phases":[{"name":"smoke","duration":30,"arrivalRate":1,"maxVusers":5}]}}'
+            - /scripts/browse.yml
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: results
+              mountPath: /results
+
+      volumes:
+        - name: scripts
+          configMap:
+            name: stage7-browse-workload
+        - name: results
+          emptyDir: {}
