@@ -91,9 +91,13 @@ jobs:
           kubectl kustomize infra/observability/prometheus \
             > /tmp/prometheus-rendered.yaml
 
+          kubectl kustomize tests/performance \
+            > /tmp/performance-rendered.yaml
+
           test -s /tmp/retail-rendered.yaml
           test -s /tmp/argocd-platform-rendered.yaml
           test -s /tmp/prometheus-rendered.yaml
+          test -s /tmp/performance-rendered.yaml
 
           echo "Retail resources:"
           grep '^kind:' /tmp/retail-rendered.yaml \
@@ -146,7 +150,14 @@ jobs:
             -kubernetes-version 1.36.4 \
             /tmp/prometheus-rendered.yaml
 
+          kubeconform \
+            -strict \
+            -summary \
+            -kubernetes-version 1.36.4 \
+            /tmp/performance-rendered.yaml
+
       - name: Reject latest image tags
         run: |
           ./scripts/check-image-tags.sh /tmp/retail-rendered.yaml
           ./scripts/check-image-tags.sh /tmp/prometheus-rendered.yaml
+          ./scripts/check-image-tags.sh /tmp/performance-rendered.yaml

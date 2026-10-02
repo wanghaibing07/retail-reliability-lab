@@ -1,0 +1,20 @@
+config:
+  target: "http://localhost:8888"
+  phases:
+    - duration: 0
+      arrivalRate: 1
+
+scenarios:
+  - name: browse-read-only
+    flow:
+      - get:
+          url: "/home"
+          name: "GET /home"
+
+      - get:
+          url: "/catalog"
+          name: "GET /catalog"
+
+      - get:
+          url: "/catalog/cc789f85-1476-452a-8100-9e74502198e0"
+          name: "GET /catalog/:id"
