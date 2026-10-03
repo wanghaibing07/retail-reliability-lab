@@ -32,3 +32,13 @@ Artillery arrivalRate is virtual-user arrivals per second, not HTTP RPS.
 
 Capacity reports must record actual HTTP request rate separately from
 arrivalRate.
+
+## Runtime image supply
+
+The Kubernetes runtime remains air-gapped. Before executing a Stage 7 Artillery Job, `docker.io/artilleryio/artillery:2.0.22` must be present in the internal Registry.
+
+The repeatable bootstrap path is:
+
+`./infra/registry/seed-performance.sh`
+
+The bootstrap source is pinned by digest, while Kubernetes keeps using the original `docker.io/artilleryio/artillery:2.0.22` image reference. Normal CRI resolution must continue through the internal Registry.

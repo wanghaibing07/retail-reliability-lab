@@ -23,6 +23,23 @@
 
 两个 seed 脚本使用单架构 `linux/amd64` 内容和单并发上传，适配当前实验室节点。首次建立空 Registry 时，需要从一个临时可用的外部或离线 OCI 来源引导 `registry:3`、`busybox` 等基础镜像；完成预置后，节点运行时只访问集群内 Registry。若要求从第一步就完全断网，应提前准备 OCI tar 包并用 `ctr images import` 导入。
 
+## Stage 7 Performance 镜像
+
+Stage 7 负载生成器固定使用：
+
+- Kubernetes 镜像引用：`docker.io/artilleryio/artillery:2.0.22`
+- 外部 bootstrap 来源：`ghcr.io/wanghaibing07/retail-reliability-lab-artillery@sha256:302fb531cb18e3685eaa81858cee54750c268df111465386fdbe938918797756`
+- 平台：`linux/amd64`
+- 内部 Registry：`192.168.88.3:5000/artilleryio/artillery:2.0.22`
+
+集群运行时继续保持 air-gapped 策略；`docker.io` 不配置公共 upstream fallback。`seed-performance.sh` 只在 bootstrap 阶段通过临时 GHCR `hosts.toml` 拉取 digest-pinned 镜像，不修改 `/etc/containerd/certs.d` 的长期配置。
+
+执行：
+
+`./infra/registry/seed-performance.sh`
+
+脚本会依次完成 GHCR digest 拉取、amd64 转换、内部 Registry 上传、manifest digest 校验，以及使用原始 docker.io 镜像引用执行 CRI mirror 验证。
+
 ## 关键验收
 
 ```bash
