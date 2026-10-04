@@ -18,3 +18,8 @@ patches:
   - path: patches/stage5-checkout-write-freeze.yaml
   - path: patches/stage5-orders-write-freeze.yaml
   - path: patches/stage5-orders-postgresql-pvc-cutover.yaml
+
+images:
+  - name: public.ecr.aws/aws-containers/retail-store-sample-ui
+    newName: 192.168.88.3:5000/aws-containers/retail-store-sample-ui
+    digest: sha256:8d258792189f79f5afc787cff2e9cd9b08e1749ae6fd9b9a65dc10e8611935e1
