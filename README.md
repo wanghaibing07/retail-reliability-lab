@@ -52,6 +52,12 @@ insufficient causal evidence → no-change
 ### Evidence shortcuts
 
 - [中文架构图与 60 秒项目讲解](docs/portfolio/architecture.md)
+- [3～5 条简历项目描述](docs/portfolio/resume-bullets.md)
+- [3 分钟 / 10 分钟讲解](docs/portfolio/interview-guide.md)
+- [五个工程与排障故事](docs/portfolio/incident-stories.md)
+- [项目面试题库：先回答，再看证据](docs/portfolio/interview-question-bank.md)
+- [统一声明边界：可以说什么、证据在哪里](docs/portfolio/claim-boundaries.md)
+- [stage7-v0.8 Release 说明草稿](docs/portfolio/stage7-release-notes.md)
 - [Stage 7 closeout](docs/performance/stage7-closeout.md)
 - [Stage 7 evidence index](evidence/stage7/README.md)
 - [Stage 6 closeout](docs/releases/stage6-closeout.md)
@@ -61,6 +67,8 @@ insufficient causal evidence → no-change
 
 
 ## 已完成能力
+
+下方按阶段保留历史验证记录；Healthy、target 数量及组件范围描述的是对应阶段的观测，不代表实验室当前在线状态。对外表达统一参照 [声明边界](docs/portfolio/claim-boundaries.md)。
 
 ### 1. Kubernetes 业务基线
 
@@ -299,12 +307,12 @@ Stage 4 已完成最小可观测与告警闭环：
 - Blackbox Exporter 跨节点探测 Retail UI NodePort
 - Alertmanager 已真实验证 firing 与 resolved 邮件
 - kube-state-metrics 采集 Node、Pod、Deployment、StatefulSet 对象状态
-- Prometheus 当前监控 8 个 target
+- Stage 4 封板时 Prometheus 监控 8 个 target；Stage 7 另扩展了应用与容器指标
 - 4 条可行动告警：Retail UI、监控/GitOps target、Node Ready、Argo Application 状态
 - 告警规则具备 promtool 语法检查与时序行为测试
 - 保存四组诊断 PromQL：业务、GitOps、Node/Workload、监控自身
 - Prometheus PVC 已验证跨 Pod 替换保留历史样本
-- 最终 Retail / observability 均为 Synced / Healthy，8/8 targets up，4/4 alert rules health=ok / inactive
+- Stage 4 最终快照：Retail / observability 均为 Synced / Healthy，8/8 targets up，4/4 alert rules health=ok / inactive
 
 自然观察期间真实捕获一次 repo-server GitHub `info/refs` EOF：
 Retail 短暂进入 `Sync=Unknown`，`ArgoApplicationUnhealthy` 进入 pending，
@@ -321,7 +329,7 @@ Stage 4 仍明确保持以下边界：
 - local-path-retain 不是跨节点复制存储
 - 集群内监控无法覆盖整个实验室完全停机
 - Retail UI HTTP 200 只验证首页入口，不代表完整交易链路
-- 当前未部署 node-exporter，不宣称具备节点 CPU/内存/磁盘连续时序指标
+- Stage 4 未部署 node-exporter；后续历史采样与 Git 中的可重复部署范围需分别核对，不宣称节点指标连续、无空窗
 - GitHub repo-server 外部访问仍存在间歇抖动历史
 
 完整封板证据：
