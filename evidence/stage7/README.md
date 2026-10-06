@@ -10,4 +10,4 @@ Primary qualified point: E11 (`S7-30RPS-RAMP-20261006-s7e7-attempt11`), includin
 Repeated degradation: E12/E14; longer isolation E15.
 Excluded from capacity qualification: E16 missing post/query_range; E17 warm-up failure; E18 never started. Historical lower-load3–12RPS is inherited from the approved handover, with no new local qualification asserted.
 
-The manifest preserves files as captured, including diagnostic and partial evidence. A listed file does not imply a successful or valid experiment. S7-E is closed with an environment limitation; final release status remains pending PR/CI/authorized merge/tag.
+The manifest preserves files as captured, including diagnostic and partial evidence. A listed file does not imply a successful or valid experiment. S7-E is closed with an environment limitation; final release acceptance is independently tracked by PR #57, its merged commit/CI and stage7-v0.8 tag.

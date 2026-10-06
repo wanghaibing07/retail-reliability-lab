@@ -445,7 +445,7 @@ bad Git merge
 - [Stage 7 closeout](docs/performance/stage7-closeout.md)
 - [Stage 7 evidence index](evidence/stage7/README.md)
 
-文档和证据已准备；最终封板仍待PR/CI、用户授权merge及release tag。
+文档与证据已收齐到上述索引；最终验收以 [PR #57](https://github.com/wanghaibing07/retail-reliability-lab/pull/57) 的实际合并提交、CI 和 `stage7-v0.8` annotated tag 为准。
 
 ## 项目边界
 

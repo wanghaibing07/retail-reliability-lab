@@ -9,7 +9,7 @@ This stage measures the existing Retail browse workload in the local three-node 
 | S7-A–D | DONE, inherited from approved Stage 7 handover | Existing baseline includes the prior UI async fix at the tested revision; this closeout adds no application changes. |
 | S7-E | DONE_WITH_ENVIRONMENT_LIMITATION | 30 RPS healthy / 300s; repeatable degradation at 45; 39 not qualified. |
 | S7-F | DONE: no new SUT optimization | Insufficient causal evidence for a safe component-specific change. |
-| S7-G | Report and evidence index prepared; release pending | PR, CI, merge authorization and release tag still required. |
+| S7-G | DONE: final report and evidence index prepared | Release acceptance is tracked by PR #57, its merged commit/CI and annotated tag stage7-v0.8. |
 
 ## Fixed identity and method
 
@@ -100,4 +100,4 @@ Use30RPS as the currently validated Lab point for this workload/duration, not ma
 
 See [evidence index](../../evidence/stage7/README.md), machine-readable register and compact archive/report SHA256 index. The full local evidence manifest and its hash are recorded in summary.json. Raw private logs remain in the local experiment directories; this PR contains only aggregate conclusions and content hashes, no credentials, cookies, chat transcript or raw sensitive logs. Evidence presence does not erase the explicitly listed E16 gaps.
 
-This document is prepared for review. It does not assert PR merge, release tag, current Lab health, or Stage7 final acceptance. Final release must reference the actual merged commit and CI/tag evidence. The user's explicit no-merge boundary remains in force until changed by the user.
+This document records the completed evidence-driven closeout work. It does not by itself assert PR merge, release tag, current Lab health, or Stage7 final acceptance. Release acceptance is independently auditable through [PR #57](https://github.com/wanghaibing07/retail-reliability-lab/pull/57), the actual merged commit/CI and annotated tag `stage7-v0.8`. The user's explicit no-merge boundary remains in force until changed by the user.

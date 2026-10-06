@@ -19,7 +19,7 @@
   },
   "S7_E": "DONE_WITH_ENVIRONMENT_LIMITATION",
   "S7_F": "SUT_OPTIMIZATION_NOT_APPLIED_INSUFFICIENT_CAUSAL_EVIDENCE",
-  "release_status": "PENDING_PR_CI_MERGE_TAG",
+  "release_status": "TRACKED_EXTERNALLY_BY_PR_57_MERGED_COMMIT_CI_AND_STAGE7_V0_8_TAG",
   "local_evidence_file_count": 57318,
   "attempts": [
     {
@@ -205,5 +205,7 @@
   ],
   "full_manifest_sha256": "5b6d7fba9b38d9462fbb4d7575b415fe1e2e09adb650f8ce23a96a66cfb49647",
   "full_manifest_location": "execution workspace: stage7-closeout-delivery/SHA256SUMS-full-local-evidence.txt",
-  "published_hash_entries": 83
+  "published_hash_entries": 83,
+  "S7_G": "FINAL_REPORT_AND_EVIDENCE_INDEX_PREPARED",
+  "release_pr": "https://github.com/wanghaibing07/retail-reliability-lab/pull/57"
 }
