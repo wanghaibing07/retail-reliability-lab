@@ -438,7 +438,14 @@ bad Git merge
 - [Release Failure Recovery Runbook](docs/runbooks/release-failure-recovery.md)
 - [Stage 6 Evidence](docs/evidence/stage6/readiness-failure-001/)
 
-下一阶段：Stage 7 Performance / Capacity。
+## Stage 7 Performance / Capacity
+
+容量实验按环境限制封板：30 RPS /300s 已验证健康；45RPS 可重复退化；39RPS 未有效资格确认。精确拐点和硬容量上限未确定。S7-F 无充分因果证据，因此不新增SUT优化。
+
+- [Stage 7 closeout](docs/performance/stage7-closeout.md)
+- [Stage 7 evidence index](evidence/stage7/README.md)
+
+文档和证据已准备；最终封板仍待PR/CI、用户授权merge及release tag。
 
 ## 项目边界
 
