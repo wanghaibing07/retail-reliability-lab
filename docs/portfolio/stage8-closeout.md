@@ -1,4 +1,6 @@
-# Stage 8 Portfolio / Interview Packaging 验收
+# Stage 8 作品集与面试材料验收
+
+> 中文阅读入口：[先用中文看懂项目与术语](plain-language-guide.md)。工具名称、命令和正式状态字段保留原文，便于核对证据。
 
 **结论：Stage 8 交付材料完成。** 2026-10-06，将既有 Stage 0～7 记录压缩为招聘入口、项目表达、面试追问与证据边界。完成的是作品集材料交付，不宣称本人已经排练熟练或获得招聘结果。
 
@@ -6,14 +8,14 @@
 
 | 项目 | 状态 | 可审阅交付 |
 | --- | --- | --- |
-| S8-A：30 秒 README | COMPLETE | [项目定位、关键结果与证据入口](../../README.md#30-秒看懂这个项目)，Stage 7/8 状态与历史快照口径已统一 |
-| S8-B：架构图 | COMPLETE | [交付/监控主图、业务依赖与恢复路径](architecture.md)，使用仓库内 Mermaid，不依赖在线 Lab |
-| S8-C：五个故事 | COMPLETE | [五个工程与排障故事](incident-stories.md)，区分真实 Incident、主动演练和风险整改 |
-| S8-D：分层讲解 | COMPLETE | [60 秒](architecture.md#60-秒讲解)及 [3 分钟 / 10 分钟](interview-guide.md)讲稿，含被打断后的转向提示 |
-| S8-E：简历条目 | COMPLETE | [五条成果与按岗位选择方法](resume-bullets.md)，每条有证据与数字边界 |
-| S8-F：项目题库 | COMPLETE | [24 题、12 道优先题](interview-question-bank.md)，折叠短答、项目证据与下一层追问 |
-| S8-G：声明边界 | COMPLETE | [统一边界表](claim-boundaries.md)，保留有效/无效资格、统计窗口与未确定项 |
-| S8-H：Release / 仓库展示 | COMPLETE | [stage7-v0.8 Release](https://github.com/wanghaibing07/retail-reliability-lab/releases/tag/stage7-v0.8)、[发布核验](stage7-release-notes.md)，README 直接链接全部求职材料，项目已固定到 [个人主页](https://github.com/wanghaibing07) |
+| S8-A：30 秒 README | 完成 | [项目定位、关键结果与证据入口](../../README.md#30-秒看懂这个项目)，Stage 7/8 状态与历史快照口径已统一 |
+| S8-B：架构图 | 完成 | [交付/监控主图、业务依赖与恢复路径](architecture.md)，使用仓库内 Mermaid，不依赖在线 Lab |
+| S8-C：五个故事 | 完成 | [五个工程与排障故事](incident-stories.md)，区分真实 Incident、主动演练和风险整改 |
+| S8-D：分层讲解 | 完成 | [60 秒](architecture.md#60-秒讲解)及 [3 分钟 / 10 分钟](interview-guide.md)讲稿，含被打断后的转向提示 |
+| S8-E：简历条目 | 完成 | [五条成果与按岗位选择方法](resume-bullets.md)，每条有证据与数字边界 |
+| S8-F：项目题库 | 完成 | [24 题、12 道优先题](interview-question-bank.md)，折叠短答、项目证据与下一层追问 |
+| S8-G：声明边界 | 完成 | [统一边界表](claim-boundaries.md)，保留有效/无效资格、统计窗口与未确定项 |
+| S8-H：Release / 仓库展示 | 完成 | [stage7-v0.8 Release](https://github.com/wanghaibing07/retail-reliability-lab/releases/tag/stage7-v0.8)、[发布核验](stage7-release-notes.md)，README 直接链接全部求职材料，项目已固定到 [个人主页](https://github.com/wanghaibing07) |
 
 ## 变更与验证记录
 
@@ -25,6 +27,10 @@
 - GitHub 个人主页已将 retail-reliability-lab 设为 Pinned，页面显示保存成功。
 
 Stage 8 仅修改展示文档并发布现存 tag 的 Release。Stage 7 closeout、实验登记表和证据索引保持原样；`stage7-v0.8` annotated tag 对象仍为 `1fa73f104040dec7885e63105d61a3ec2e0f3179`，target 仍为 `0fa9720338d553ab9cd815e7cc79ebea42f178e2`。未启动 VM、未运行新容量实验、未新增 SUT 优化。作品集完成通过本次 PR 和 main 记录，无需另建 portfolio tag。
+
+## 中文求职展示补充
+
+面向深圳求职补充 [中文速读与术语对照](plain-language-guide.md)，README 顶部与 Release 正文改为中文解释。各份材料均提供速读入口；个人主页新增中文介绍、求职方向、代表项目成果表和仓库内静态横幅。仅更新展示层，既有技术证据与发布 tag 不变。
 
 ## 怎样使用这些材料
 
