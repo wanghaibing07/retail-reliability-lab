@@ -51,6 +51,7 @@ insufficient causal evidence → no-change
 
 ### Evidence shortcuts
 
+- [中文架构图与 60 秒项目讲解](docs/portfolio/architecture.md)
 - [Stage 7 closeout](docs/performance/stage7-closeout.md)
 - [Stage 7 evidence index](evidence/stage7/README.md)
 - [Stage 6 closeout](docs/releases/stage6-closeout.md)
