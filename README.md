@@ -1,26 +1,22 @@
 # Retail Reliability Lab
 
-基于 **AWS Retail Store Sample App v1.6.2** 构建的 Kubernetes 运维与可靠性工程实验室。
+这是我在三台 VMware 虚拟机上做的 Kubernetes 运维实验。应用使用 **AWS Retail Store Sample App v1.6.2**，业务代码来自 AWS；我维护部署配置、运维脚本和实验记录。
 
-> 我没有从零开发这套电商微服务；项目重点是把真实微服务样例持续演进为一个可重复部署、可验证、可监控、可恢复、可做容量实验的 Kubernetes 运维与可靠性实验室。
+## 项目概况
 
-## 30 秒看懂这个项目
+项目从镜像拉取异常排查开始，随后整理了部署和检查脚本，接入 GitHub Actions、Argo CD 与监控，再做订单数据库恢复、发布失败和性能测试。各阶段的配置、操作步骤和结果保存在仓库中。
 
-这个项目验证的不是“应用能不能跑起来”，而是服务从 **能运行** 到 **能被可靠运维** 的完整过程：
+几项已经完成的验证：
 
-可重复部署 → 自动检查 → 按 Git 配置部署 → 监控告警 → 数据恢复 → 发布故障恢复 → 性能与容量验证。
+| 记录 | 主要结果 |
+| --- | --- |
+| [自动部署与配置同步](docs/gitops/stage3-gitops.md) | 修改先自动检查再部署；手工把 UI 改为一个副本后，Argo CD 恢复为 Git 中的两个 |
+| [告警通知](docs/observability/stage4-metric-driven-alert-drill.md) | 临时改变探测成功判据，实际收到触发和恢复邮件；演练期间业务入口仍返回 200 |
+| [订单数据库恢复](docs/backup/stage5-closeout.md) | 隔离恢复后应用能读回订单；迁移至持久存储并重建 Pod 后，新旧订单仍在 |
+| [发布失败演练](docs/releases/stage6-closeout.md) | 新 UI 实例无法就绪时，旧实例继续服务；撤销 Git 配置后恢复 |
+| [性能测试](docs/performance/stage7-closeout.md) | 只读浏览负载下，30 RPS 持续 300 秒已验证健康；45 RPS 多轮阶段性退化，后段恢复，最大容量尚未确定 |
 
-### 关键成果
-
-- **自动交付与纠偏**：代码修改通过合并请求（PR）和 GitHub Actions 自动检查后，由 Argo CD 按 Git 配置部署；验证自动同步、手工偏差纠正（Self Heal）和已删除资源清理（Prune）。
-- **告警通知闭环**：用 Prometheus 采集指标、Blackbox 探测业务入口、Alertmanager 通知，实际验证告警触发和恢复邮件，以及滚动发布停滞告警。
-- **订单数据恢复**：对 Orders PostgreSQL 实际完成备份校验、隔离恢复和应用读回；迁移到保留策略的持久存储，并验证 Pod 重建后订单仍在。
-- **发布失败恢复**：故意让新 UI 实例无法通过就绪检查，观察旧健康实例继续服务；通过撤销 Git 中的错误配置（`git revert`），经自动检查与 Argo CD 恢复。
-- **容量证据判断**：固定只读浏览负载下，**每秒 30 个 HTTP 请求（30 RPS）持续 300 秒已验证健康**；45 RPS 多轮出现阶段性退化，后段恢复。精确性能拐点与最大容量尚未确定，因果证据不足时未新增调优。
-
-四条工程原则：实例在运行，不代表已就绪或业务健康；Git 记录期望配置；同时出现的现象不等于因果关系；缺少证据时不盲目改系统。
-
-**第一次阅读？先读 [中文速读与术语对照](docs/portfolio/plain-language-guide.md)**，里面有能直接练习的 60 秒人话版。
+[项目概况与术语说明](docs/portfolio/plain-language-guide.md)按实际过程介绍这些记录；[架构图](docs/portfolio/architecture.md)说明服务之间的关系。
 
 ## 当前进度
 
@@ -36,7 +32,7 @@
 | Stage 7 | 性能与容量验证 | ✅ 完成 |
 | Stage 8 | 作品集与面试材料 | ✅ 完成 |
 
-### 讲解材料与证据入口
+### 相关文档
 
 - [中文架构图与 60 秒项目讲解](docs/portfolio/architecture.md)
 - [3～5 条简历项目描述](docs/portfolio/resume-bullets.md)
