@@ -1,14 +1,39 @@
 # Retail Reliability Lab
 
-基于 AWS Retail Store Sample App v1.6.2 的 Kubernetes 可靠性工程实验项目。
+基于 **AWS Retail Store Sample App v1.6.2** 构建的 Kubernetes Reliability Engineering Lab。
 
-项目重点不是单纯“把应用跑起来”，而是逐步验证：
+> 我没有从零开发这套电商微服务；项目重点是把真实微服务样例持续演进为一个可重复部署、可验证、可监控、可恢复、可做容量实验的 Kubernetes 运维与可靠性实验室。
 
-- 应用能否稳定、可重复部署
-- 代码和 Kubernetes 清单变更能否自动检查
-- Git 能否成为集群期望状态来源
-- 故障能否被发现、定位和恢复
-- 有状态数据能否完成可验证的备份与恢复
+## 30 秒看懂这个项目
+
+这个项目验证的不是“应用能不能跑起来”，而是服务从 **能运行** 到 **能被可靠运维** 的完整过程：
+
+```text
+Reproducible Deploy
+→ CI Quality Gate
+→ GitOps / Argo CD
+→ Observability & Alerting
+→ Backup / Restore
+→ Release Failure & Recovery
+→ Performance / Capacity Evidence
+```
+
+### Key Outcomes
+
+- **GitOps 闭环**：受保护 PR + GitHub Actions + Argo CD Auto Sync / Self Heal / Prune，以 Git 作为 desired state。
+- **真实告警闭环**：Prometheus + Alertmanager + Blackbox Exporter 等链路实际验证过 firing → resolved，并覆盖 rollout stalled。
+- **可验证数据恢复**：Orders PostgreSQL 完成逻辑备份、SHA256 校验、隔离恢复、应用层数据验证、Retain PVC 迁移与 Pod 重建持久性验证。
+- **受控发布失败恢复**：故意注入 readiness 故障，旧副本继续服务；通过 `git revert → CI → Argo CD` 恢复，不依赖 live rollback。
+- **容量实验与证据边界**：已证明 **30 RPS / 300s 健康运行**；在 **45 RPS** 重复观察到 episodic degradation；exact knee / maximum capacity 保持 unresolved，未在证据不足时盲目调优。
+
+核心工程原则：
+
+```text
+Running ≠ Ready ≠ Service Healthy ≠ Business Healthy
+Git is desired state
+correlation ≠ causation
+insufficient causal evidence → no-change
+```
 
 ## 当前进度
 
@@ -21,8 +46,18 @@
 | Stage 4 | Observability | ✅ 完成 |
 | Stage 5 | Backup / Restore | ✅ 完成 |
 | Stage 6 | Release Failure & Recovery | ✅ 完成 |
-| Stage 7 | Performance / Capacity | ⏳ Planned |
-| Stage 8 | Portfolio / Interview Packaging | ⏳ Planned |
+| Stage 7 | Performance / Capacity | ✅ 完成 |
+| Stage 8 | Portfolio / Interview Packaging | 🚧 进行中 |
+
+### Evidence shortcuts
+
+- [Stage 7 closeout](docs/performance/stage7-closeout.md)
+- [Stage 7 evidence index](evidence/stage7/README.md)
+- [Stage 6 closeout](docs/releases/stage6-closeout.md)
+- [Stage 5 closeout](docs/backup/stage5-closeout.md)
+- [Stage 4 closeout](docs/observability/stage4-closeout.md)
+- [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
+
 
 ## 已完成能力
 
