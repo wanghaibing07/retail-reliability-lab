@@ -1,7 +1,9 @@
 # 简历项目条目
 
-项目名称：**Retail Reliability Lab｜Kubernetes 可靠性工程实验室**  
-项目性质：个人实验项目，基于 AWS Retail Store Sample App v1.6.2；业务应用来自上游。  
+项目名称：**Retail Reliability Lab｜Kubernetes 可靠性工程实验室**
+
+项目性质：个人实验项目，基于 AWS Retail Store Sample App v1.6.2；业务应用来自上游。
+
 项目链接：[GitHub](https://github.com/wanghaibing07/retail-reliability-lab)
 
 以下描述依据 Stage 0～7 已记录的工作。项目日期按本人真实开始与结束时间填写，不补造任职、团队或生产经历。
