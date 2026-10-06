@@ -4,6 +4,8 @@
 
 本文依据 `stage7-v0.8`（`0fa9720338d553ab9cd815e7cc79ebea42f178e2`）的 Git 配置和封板证据绘制。图中展示设计关系与已记录的实验路径，不代表实验室此刻在线或健康；Stage 8 无需启动 VM。
 
+求职材料：[简历项目条目](resume-bullets.md) · [60 秒／3 分钟／10 分钟讲解](interview-guide.md) · [五个工程与排障故事](incident-stories.md)。
+
 ## 一张图讲清主线
 
 实线表示交付或流量；虚线表示指标、告警与校验。CI 检查 PR 内容，合并后的 `main` 才是 Argo CD 的同步来源；GitHub Actions 不直接部署集群。
