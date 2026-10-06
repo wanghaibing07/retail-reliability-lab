@@ -1,6 +1,6 @@
 # Stage 7 GitHub Release 发布说明
 
-状态：说明已准备，尚未发布 GitHub Release 页面。Git tag 已存在，Stage 7 release acceptance 已成立；GitHub 页面属于 Stage 8 展示工作。
+状态：已发布 [GitHub Release 页面](https://github.com/wanghaibing07/retail-reliability-lab/releases/tag/stage7-v0.8)。发布时间为 2026-10-06 22:49:48（Asia/Shanghai，UTC 14:49:48），Release ID 为 `404844004`，draft=false、prerelease=false。Git tag 原已存在，Stage 7 release acceptance 原已成立；本次页面发布属于 Stage 8 展示工作。
 
 | 发布字段 | 固定值 |
 | --- | --- |
@@ -9,7 +9,7 @@
 | Tag target | `0fa9720338d553ab9cd815e7cc79ebea42f178e2` |
 | 发布范围 | 已封板报告与证据索引，不含新实验或优化 |
 
-发布时选择现存 tag，不创建新 tag、不移动 target。下面正文只链接该 tag 的内容，避免把后续 main 的文档包装误当成 Stage 7 发布文件。不额外上传缺失的原始日志或编造附件。
+本次发布选择现存 tag，未创建新 tag、未移动 target。下面正文只链接该 tag 的内容，避免把后续 main 的文档包装误当成 Stage 7 发布文件。未额外上传原始日志；页面的两个 Source code 压缩包是 GitHub 自动提供的 tag 源码归档。
 
 ## Release body
 
@@ -26,8 +26,8 @@ Stage 7 Performance / Capacity Closeout for the local three-node Retail Reliabil
 
 The public index contains summaries and archive hashes. Full raw logs remain in the original execution workspace and are not bundled in this Release.
 
-## 发布后核验
+## 发布后核验结果
 
-核对 Release 页面使用 `stage7-v0.8`，tag 仍指向上述提交，正文与本稿一致；记录页面链接。页面实际发布前，README 的 Stage 8 状态保持进行中，不把 S8-H 宣布完成。
+页面显示 `stage7-v0.8` 与提交 `0fa9720`；GitHub API 确认非草稿、非 prerelease。正文与上方入库稿逐字一致（仅统一 CRLF/LF 换行），tag 对象与 target 保持原值。S8-H 的 Release 展示已完成，Stage 7 技术结论未改变。
 
 机制依据：[GitHub 官方：管理 Release，选择现有 tag](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)。

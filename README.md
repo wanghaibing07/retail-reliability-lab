@@ -47,7 +47,7 @@ insufficient causal evidence → no-change
 | Stage 5 | Backup / Restore | ✅ 完成 |
 | Stage 6 | Release Failure & Recovery | ✅ 完成 |
 | Stage 7 | Performance / Capacity | ✅ 完成 |
-| Stage 8 | Portfolio / Interview Packaging | 🚧 进行中 |
+| Stage 8 | Portfolio / Interview Packaging | ✅ 完成 |
 
 ### Evidence shortcuts
 
@@ -57,7 +57,8 @@ insufficient causal evidence → no-change
 - [五个工程与排障故事](docs/portfolio/incident-stories.md)
 - [项目面试题库：先回答，再看证据](docs/portfolio/interview-question-bank.md)
 - [统一声明边界：可以说什么、证据在哪里](docs/portfolio/claim-boundaries.md)
-- [stage7-v0.8 Release 说明草稿](docs/portfolio/stage7-release-notes.md)
+- [stage7-v0.8 GitHub Release](https://github.com/wanghaibing07/retail-reliability-lab/releases/tag/stage7-v0.8)
+- [Stage 8 验收与材料使用顺序](docs/portfolio/stage8-closeout.md)
 - [Stage 7 closeout](docs/performance/stage7-closeout.md)
 - [Stage 7 evidence index](evidence/stage7/README.md)
 - [Stage 6 closeout](docs/releases/stage6-closeout.md)
