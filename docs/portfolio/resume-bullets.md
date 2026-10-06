@@ -2,9 +2,9 @@
 
 > 中文阅读入口：[先用中文看懂项目与术语](plain-language-guide.md)。工具名称、命令和正式状态字段保留原文，便于核对证据。
 
-项目名称：**Retail Reliability Lab｜Kubernetes 可靠性工程实验室**
+项目名称：**Retail Reliability Lab｜三节点 Kubernetes 可靠性工程实验室**
 
-项目性质：个人实验项目，基于 AWS Retail Store Sample App v1.6.2；业务应用来自上游。
+项目定位：基于 AWS Retail Store Sample App v1.6.2 的三节点 Kubernetes 可靠性工程实验室；业务应用采用上游样例，负责运维配置、自动化脚本、故障排查和验证。
 
 项目链接：[GitHub](https://github.com/wanghaibing07/retail-reliability-lab)
 
@@ -12,11 +12,11 @@
 
 ## 推荐条目：按岗位选 3～5 条
 
-1. 基于三节点 Kubernetes 搭建可靠性实验室，编写部署与分层验证脚本，结合 GitHub Actions 和 Argo CD 验证 PR 检查、自动同步、自愈及资源清理流程，并为有状态工作负载设置删除确认保护。
+1. 基于 AWS Retail Store Sample App 构建三节点 Kubernetes 可靠性工程实验室，编写部署与分层验证脚本，结合 GitHub Actions 和 Argo CD 验证 PR 检查、自动同步、自愈及资源清理流程，并为有状态工作负载设置删除确认保护。
 2. 搭建 Prometheus、Alertmanager 与 Blackbox 监控链路，通过受控探测判据演练验证告警触发与恢复邮件，结合对象状态、应用指标和容器资源指标辅助排障，并验证发布停滞告警。
-3. 完成 Orders PostgreSQL 逻辑备份、SHA256 校验、跨 VM 隔离恢复及数据库/API 数据读回验证，将数据从 emptyDir 迁移至 Retain PVC，并验证 Pod 重建后新旧订单保留。
+3. 完成 Orders PostgreSQL 逻辑备份、SHA256 校验、跨节点隔离恢复及数据库/API 数据读回验证，将数据从 emptyDir 迁移至 Retain PVC，并验证 Pod 重建后新旧订单保留。
 4. 设计 UI readiness 发布故障演练，以双副本、maxUnavailable=0 和 maxSurge=1 保留旧健康实例，验证坏 Pod 不进入 Ready 后端及发布停滞告警，并经 Git revert、CI 和 Argo CD 恢复服务状态。
-5. 使用 Artillery 与 Prometheus 执行只读浏览容量实验，验证 30 RPS 下健康运行 300 秒，在 45 RPS 重复观察到阶段性退化；因 39 RPS 证据不完整而不纳入有效容量结论，未在因果证据不足时盲目调参。
+5. 使用 Artillery 与 Prometheus 执行只读浏览容量实验，验证 30 RPS 下健康运行 300 秒，在 45 RPS 重复观察到阶段性退化；39 RPS 未取得有效资格结论，精确性能拐点与最大容量尚未确定。
 
 | 条目 | 最短证据入口 | 能讲清的一个追问 |
 | --- | --- | --- |

@@ -2,7 +2,7 @@
 
 > 中文阅读入口：[先用中文看懂项目与术语](plain-language-guide.md)。工具名称、命令和正式状态字段保留原文，便于核对证据。
 
-基于 AWS Retail Store Sample App v1.6.2 的三节点 Kubernetes 可靠性工程实验室。业务样例来自上游；本项目负责部署自动化、CI、GitOps、监控、数据恢复、受控发布故障与容量验证。Stage 7 基线包含已记录的 UI async 修复，不将上游应用归为从零自研。
+基于 AWS Retail Store Sample App v1.6.2 搭建的三节点 Kubernetes 可靠性工程实验室。业务应用采用上游样例；项目包含自动化部署、CI、GitOps、监控告警、数据恢复、受控发布故障与容量验证。已记录的 UI 异步调用修复包含在 Stage 7 测试基线中。
 
 本文依据 `stage7-v0.8`（`0fa9720338d553ab9cd815e7cc79ebea42f178e2`）的 Git 配置和封板证据绘制。图中展示设计关系与已记录的实验路径，不代表实验室此刻在线或健康；Stage 8 无需启动 VM。
 
@@ -19,7 +19,7 @@ flowchart TD
   gate -->|否| pr
   gate -->|是| git["main：期望状态"]
   git --> argo
-  subgraph lab["VMware：三节点 Kubernetes 实验室"]
+  subgraph lab["三节点 Kubernetes 集群"]
     argo["Argo CD：同步、自愈、清理"] --> retail["Retail：UI、业务服务与数据依赖"]
     user["访问入口：NodePort"] --> retail
     load["Artillery：master 上的 performance 命名空间"] -->|"UI ClusterIP，只读浏览"| retail
@@ -37,7 +37,7 @@ flowchart TD
 
 ### 60 秒讲解
 
-> 我基于 AWS 的电商微服务样例，在本地三节点 Kubernetes 上做了一个可靠性实验室。业务应用来自上游，我主要做运维与可靠性验证。变更先经过 PR 和 CI，再由 Argo CD 从 main 同步到集群；监控同时看入口探测、应用指标、对象状态和容器资源。我实际验证了告警触发与恢复邮件、Orders PostgreSQL 隔离恢复，以及 readiness 发布故障后的 Git revert 恢复。容量实验确认只读浏览负载在 30 RPS 下健康运行 300 秒，45 RPS 出现可重复的阶段性退化，但最大容量和唯一瓶颈没有确定。这个项目的重点是用证据判断服务能否被可靠运维。
+> 我基于 AWS Retail Store Sample App 搭建了三节点 Kubernetes 可靠性工程实验室，主要负责自动化部署、GitOps、监控告警、数据恢复、发布故障与容量验证。变更先经过 PR 和 CI，再由 Argo CD 从 main 同步到集群；监控同时看入口探测、应用指标、对象状态和容器资源。我实际验证了告警触发与恢复邮件、Orders PostgreSQL 隔离恢复，以及 readiness 发布故障后的 Git revert 恢复。容量实验确认只读浏览负载在 30 RPS 下健康运行 300 秒，45 RPS 出现可重复的阶段性退化，但最大容量和唯一瓶颈没有确定。
 
 ## 业务服务与数据依赖
 

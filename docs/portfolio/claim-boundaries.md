@@ -2,7 +2,7 @@
 
 > 中文阅读入口：[先用中文看懂项目与术语](plain-language-guide.md)。工具名称、命令和正式状态字段保留原文，便于核对证据。
 
-用于审核 README、简历、讲稿和 Release。先说本人完成的动作与实测结果，再限定环境、负载、时间和证据范围。概念依据不能替代项目实测；旧阶段的 Healthy 不是当前在线证明。
+用于审核 README、简历、讲稿和 Release。项目定位统一为“基于 AWS Retail Store Sample App 的三节点 Kubernetes 可靠性工程实验室”，部署环境与验证限制在相应技术记录中具体说明。先说本人完成的动作与实测结果，再限定环境、负载、时间和证据范围。概念依据不能替代项目实测；旧阶段的 Healthy 不是当前在线证明。
 
 Stage 7 正式结论固定在 [stage7-v0.8 closeout](https://github.com/wanghaibing07/retail-reliability-lab/blob/stage7-v0.8/docs/performance/stage7-closeout.md)。本文件只整理表达，不重判实验、不补运行证据。
 
@@ -10,7 +10,7 @@ Stage 7 正式结论固定在 [stage7-v0.8 closeout](https://github.com/wanghaib
 
 | 主题 | 可以说 | 不能扩大为 | 项目证据 |
 | --- | --- | --- | --- |
-| 归属与职责 | 基于 AWS Retail Store Sample App，完成部署、交付、监控、恢复和故障验证；固定基线包含已记录的 UI async 修复 | 本人从零开发整套电商微服务，或业务代码全部未改动 | [上游说明](https://github.com/aws-containers/retail-store-sample-app)、[基线修复](../performance/stage7-c4/ui-async-fix.patch) |
+| 归属与职责 | 基于 AWS Retail Store Sample App 构建三节点 Kubernetes 可靠性工程实验室，完成部署、交付、监控、恢复和故障验证；固定基线包含已记录的 UI async 修复 | 本人从零开发整套电商微服务，或业务代码全部未改动 | [上游说明](https://github.com/aws-containers/retail-store-sample-app)、[基线修复](../performance/stage7-c4/ui-async-fix.patch) |
 | 环境 | 本地三节点 VMware/Kubernetes 实验室 | AWS 云上生产部署、三台独立物理宿主、生产级 HA，或实验室目前健康 | [架构与环境边界](architecture.md) |
 | 重复部署 | 两次受控 destroy→deploy→verify 成功，镜像准备从部署流程中拆离 | 冷启动安装全部基础设施只需约四分钟，或所有脚本严格幂等 | [部署记录](../../README.md#3-可重复部署)、[脚本](../../scripts/) |
 | CI | 检查 Shell、manifest 和镜像规则；真实发现过 SC2029 | CI PASS 保证探针、业务语义和发布运行时正确 | [CI](../../.github/workflows/ci.yml)、[发布反例](../releases/stage6-closeout.md) |

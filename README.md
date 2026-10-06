@@ -1,6 +1,6 @@
 # Retail Reliability Lab
 
-这是我在三台 VMware 虚拟机上做的 Kubernetes 运维实验。应用使用 **AWS Retail Store Sample App v1.6.2**，业务代码来自 AWS；我维护部署配置、运维脚本和实验记录。
+基于 **AWS Retail Store Sample App v1.6.2** 搭建的三节点 **Kubernetes 可靠性工程实验室**。项目覆盖自动化部署、GitOps、监控告警、订单数据恢复、发布故障恢复和容量验证；业务应用采用上游样例，我负责部署与监控配置、自动化脚本、故障排查和验证记录。
 
 ## 项目概况
 
@@ -50,7 +50,7 @@
 - [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
 
 
-## 已完成能力
+## 各阶段实施与验证
 
 下方按阶段保留历史验证记录；Healthy、target 数量及组件范围描述的是对应阶段的观测，不代表实验室当前在线状态。对外表达统一参照 [声明边界](docs/portfolio/claim-boundaries.md)。
 
@@ -208,7 +208,7 @@ retail-reliability-lab/
 
 ## Stage 3：Argo CD / GitOps
 
-Stage 3 已完成 GitOps 交付闭环：
+Stage 3 已验证以下 GitOps 交付流程：
 
 - `infra/apps/retail` 是 Retail 唯一 desired-state 入口
 - CI、Argo CD、`deploy.sh`、`prepull-images.sh` 统一使用该入口
@@ -285,7 +285,7 @@ business HTTP 200
 
 ## Stage 4：可观测性（已完成）
 
-Stage 4 已完成最小可观测与告警闭环：
+Stage 4 已完成以下监控与告警验证：
 
 - Prometheus v3.13.3 持久化到 `local-path-retain` PVC，48h / 3GB retention
 - Blackbox Exporter 跨节点探测 Retail UI NodePort
@@ -331,7 +331,7 @@ Stage 4 已封板，后续恢复能力由 Stage 5 验证。
 
 ## Stage 5：Backup / Restore（已完成）
 
-Stage 5 聚焦 Orders PostgreSQL，完成从临时 `emptyDir` 到 retained PVC 的可验证迁移与恢复闭环：
+Stage 5 聚焦 Orders PostgreSQL，完成从临时 `emptyDir` 到 retained PVC 的备份、恢复与持久存储迁移：
 
 - 使用 `pg_dump -Fc` 生成 PostgreSQL 逻辑备份
 - 备份先写 `.partial`，通过非空、`pg_restore --list`、SHA256 后才发布正式归档
@@ -379,7 +379,7 @@ Stage 5 只证明：
 
 ## Stage 6：Release Failure & Recovery（已完成）
 
-Stage 6 已完成一次受控 UI 发布失败与 GitOps 恢复闭环。
+Stage 6 已完成一次受控 UI 发布失败与 GitOps 恢复验证。
 
 长期保留的 release safety：
 
@@ -477,14 +477,6 @@ bad Git merge
 
 ## 项目边界
 
-这是本地 Kubernetes 实验环境，不宣称为生产级高可用架构。
+三节点共享物理宿主，Prometheus / Alertmanager 非高可用部署，节点本地数据卷不提供跨节点复制。恢复验证覆盖 Orders PostgreSQL，容量结论限于固定只读浏览负载。
 
-当前重点是验证：
-
-- 自动化交付
-- GitOps
-- 可观测性
-- 故障恢复
-- 数据恢复
-
-项目不会为了堆叠技术关键词而无目的加入大量组件。
+具体环境与结果范围见 [架构说明](docs/portfolio/architecture.md) 和 [声明边界](docs/portfolio/claim-boundaries.md)。

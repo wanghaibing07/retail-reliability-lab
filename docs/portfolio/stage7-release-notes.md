@@ -15,7 +15,7 @@
 
 ## Release 正文（中文）
 
-Stage 7 性能与容量验证封板：基于 AWS Retail Store Sample App 的本地三节点 Kubernetes 运维与可靠性实验室。
+Stage 7 性能与容量验证封板：基于 AWS Retail Store Sample App 的三节点 Kubernetes 可靠性工程实验室。
 
 - **已验证健康运行点：30 RPS / 300 秒**，即固定只读浏览负载下，每秒约 30 个 HTTP 请求持续 300 秒。
 - **45 RPS 多轮出现阶段性退化**：出现超时或延迟突增，后段恢复；不能称为硬上限或最大容量。

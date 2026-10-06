@@ -53,7 +53,7 @@ sudo grep -R -nE 'daocloud|1panel|proxy' /etc/containerd/certs.d || true
 
 ## 设计边界
 
-这是学习集群的“内网、单副本、单节点本地盘”方案。master 停机时 Registry 不可用；生产环境应改为多副本、共享或分布式存储、证书生命周期管理、镜像扫描和审计。`local-path-retain` 的数据也不会自动跨节点复制。
+该 Registry 采用内网访问、单副本与节点本地存储。master 停机时 Registry 不可用；生产环境应改为多副本、共享或分布式存储、证书生命周期管理、镜像扫描和审计。`local-path-retain` 的数据也不会自动跨节点复制。
 
 ## 回滚
 
