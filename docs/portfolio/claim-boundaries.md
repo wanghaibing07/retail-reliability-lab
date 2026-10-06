@@ -1,5 +1,7 @@
 # 对外声明与证据边界
 
+> 中文阅读入口：[先用中文看懂项目与术语](plain-language-guide.md)。工具名称、命令和正式状态字段保留原文，便于核对证据。
+
 用于审核 README、简历、讲稿和 Release。先说本人完成的动作与实测结果，再限定环境、负载、时间和证据范围。概念依据不能替代项目实测；旧阶段的 Healthy 不是当前在线证明。
 
 Stage 7 正式结论固定在 [stage7-v0.8 closeout](https://github.com/wanghaibing07/retail-reliability-lab/blob/stage7-v0.8/docs/performance/stage7-closeout.md)。本文件只整理表达，不重判实验、不补运行证据。

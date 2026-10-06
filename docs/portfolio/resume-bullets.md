@@ -1,5 +1,7 @@
 # 简历项目条目
 
+> 中文阅读入口：[先用中文看懂项目与术语](plain-language-guide.md)。工具名称、命令和正式状态字段保留原文，便于核对证据。
+
 项目名称：**Retail Reliability Lab｜Kubernetes 可靠性工程实验室**
 
 项目性质：个人实验项目，基于 AWS Retail Store Sample App v1.6.2；业务应用来自上游。

@@ -1,6 +1,6 @@
 # Retail Reliability Lab
 
-基于 **AWS Retail Store Sample App v1.6.2** 构建的 Kubernetes Reliability Engineering Lab。
+基于 **AWS Retail Store Sample App v1.6.2** 构建的 Kubernetes 运维与可靠性工程实验室。
 
 > 我没有从零开发这套电商微服务；项目重点是把真实微服务样例持续演进为一个可重复部署、可验证、可监控、可恢复、可做容量实验的 Kubernetes 运维与可靠性实验室。
 
@@ -8,48 +8,35 @@
 
 这个项目验证的不是“应用能不能跑起来”，而是服务从 **能运行** 到 **能被可靠运维** 的完整过程：
 
-```text
-Reproducible Deploy
-→ CI Quality Gate
-→ GitOps / Argo CD
-→ Observability & Alerting
-→ Backup / Restore
-→ Release Failure & Recovery
-→ Performance / Capacity Evidence
-```
+可重复部署 → 自动检查 → 按 Git 配置部署 → 监控告警 → 数据恢复 → 发布故障恢复 → 性能与容量验证。
 
-### Key Outcomes
+### 关键成果
 
-- **GitOps 闭环**：受保护 PR + GitHub Actions + Argo CD Auto Sync / Self Heal / Prune，以 Git 作为 desired state。
-- **真实告警闭环**：Prometheus + Alertmanager + Blackbox Exporter 等链路实际验证过 firing → resolved，并覆盖 rollout stalled。
-- **可验证数据恢复**：Orders PostgreSQL 完成逻辑备份、SHA256 校验、隔离恢复、应用层数据验证、Retain PVC 迁移与 Pod 重建持久性验证。
-- **受控发布失败恢复**：故意注入 readiness 故障，旧副本继续服务；通过 `git revert → CI → Argo CD` 恢复，不依赖 live rollback。
-- **容量实验与证据边界**：已证明 **30 RPS / 300s 健康运行**；在 **45 RPS** 重复观察到 episodic degradation；exact knee / maximum capacity 保持 unresolved，未在证据不足时盲目调优。
+- **自动交付与纠偏**：代码修改通过合并请求（PR）和 GitHub Actions 自动检查后，由 Argo CD 按 Git 配置部署；验证自动同步、手工偏差纠正（Self Heal）和已删除资源清理（Prune）。
+- **告警通知闭环**：用 Prometheus 采集指标、Blackbox 探测业务入口、Alertmanager 通知，实际验证告警触发和恢复邮件，以及滚动发布停滞告警。
+- **订单数据恢复**：对 Orders PostgreSQL 实际完成备份校验、隔离恢复和应用读回；迁移到保留策略的持久存储，并验证 Pod 重建后订单仍在。
+- **发布失败恢复**：故意让新 UI 实例无法通过就绪检查，观察旧健康实例继续服务；通过撤销 Git 中的错误配置（`git revert`），经自动检查与 Argo CD 恢复。
+- **容量证据判断**：固定只读浏览负载下，**每秒 30 个 HTTP 请求（30 RPS）持续 300 秒已验证健康**；45 RPS 多轮出现阶段性退化，后段恢复。精确性能拐点与最大容量尚未确定，因果证据不足时未新增调优。
 
-核心工程原则：
+四条工程原则：实例在运行，不代表已就绪或业务健康；Git 记录期望配置；同时出现的现象不等于因果关系；缺少证据时不盲目改系统。
 
-```text
-Running ≠ Ready ≠ Service Healthy ≠ Business Healthy
-Git is desired state
-correlation ≠ causation
-insufficient causal evidence → no-change
-```
+**第一次阅读？先读 [中文速读与术语对照](docs/portfolio/plain-language-guide.md)**，里面有能直接练习的 60 秒人话版。
 
 ## 当前进度
 
-| Stage | 内容 | 状态 |
+| 阶段 | 内容 | 状态 |
 | --- | --- | --- |
-| Stage 0 | Baseline + Incident #001 | ✅ 完成 |
-| Stage 1 | Reproducible Deploy | ✅ 完成 |
-| Stage 2 | CI Validation | ✅ 完成 |
-| Stage 3 | Argo CD / GitOps | ✅ 完成 |
-| Stage 4 | Observability | ✅ 完成 |
-| Stage 5 | Backup / Restore | ✅ 完成 |
-| Stage 6 | Release Failure & Recovery | ✅ 完成 |
-| Stage 7 | Performance / Capacity | ✅ 完成 |
-| Stage 8 | Portfolio / Interview Packaging | ✅ 完成 |
+| Stage 0 | 业务基线与第一次故障排查 | ✅ 完成 |
+| Stage 1 | 可重复部署 | ✅ 完成 |
+| Stage 2 | 自动检查与质量门禁 | ✅ 完成 |
+| Stage 3 | Git 驱动部署与自动纠偏 | ✅ 完成 |
+| Stage 4 | 监控与告警 | ✅ 完成 |
+| Stage 5 | 备份与恢复 | ✅ 完成 |
+| Stage 6 | 发布失败与恢复 | ✅ 完成 |
+| Stage 7 | 性能与容量验证 | ✅ 完成 |
+| Stage 8 | 作品集与面试材料 | ✅ 完成 |
 
-### Evidence shortcuts
+### 讲解材料与证据入口
 
 - [中文架构图与 60 秒项目讲解](docs/portfolio/architecture.md)
 - [3～5 条简历项目描述](docs/portfolio/resume-bullets.md)
@@ -59,11 +46,11 @@ insufficient causal evidence → no-change
 - [统一声明边界：可以说什么、证据在哪里](docs/portfolio/claim-boundaries.md)
 - [stage7-v0.8 GitHub Release](https://github.com/wanghaibing07/retail-reliability-lab/releases/tag/stage7-v0.8)
 - [Stage 8 验收与材料使用顺序](docs/portfolio/stage8-closeout.md)
-- [Stage 7 closeout](docs/performance/stage7-closeout.md)
-- [Stage 7 evidence index](evidence/stage7/README.md)
-- [Stage 6 closeout](docs/releases/stage6-closeout.md)
-- [Stage 5 closeout](docs/backup/stage5-closeout.md)
-- [Stage 4 closeout](docs/observability/stage4-closeout.md)
+- [Stage 7 封板报告](docs/performance/stage7-closeout.md)
+- [Stage 7 证据索引](evidence/stage7/README.md)
+- [Stage 6 发布恢复报告](docs/releases/stage6-closeout.md)
+- [Stage 5 数据恢复报告](docs/backup/stage5-closeout.md)
+- [Stage 4 监控验收报告](docs/observability/stage4-closeout.md)
 - [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
 
 
@@ -487,8 +474,8 @@ bad Git merge
 
 容量实验按环境限制封板：30 RPS /300s 已验证健康；45RPS 可重复退化；39RPS 未有效资格确认。精确拐点和硬容量上限未确定。S7-F 无充分因果证据，因此不新增SUT优化。
 
-- [Stage 7 closeout](docs/performance/stage7-closeout.md)
-- [Stage 7 evidence index](evidence/stage7/README.md)
+- [Stage 7 封板报告](docs/performance/stage7-closeout.md)
+- [Stage 7 证据索引](evidence/stage7/README.md)
 
 文档与证据已收齐到上述索引；最终验收以 [PR #57](https://github.com/wanghaibing07/retail-reliability-lab/pull/57) 的实际合并提交、CI 和 `stage7-v0.8` annotated tag 为准。
 
