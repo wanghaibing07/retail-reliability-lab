@@ -30,7 +30,7 @@ Stage 8 仅修改展示文档并发布现存 tag 的 Release。Stage 7 closeout�
 
 ## 中文求职展示补充
 
-[项目概况与术语说明](plain-language-guide.md)、README 顶部和 Release 正文提供中文阅读入口。个人主页采用 GitHub 原生文字排版，列出具体操作记录；项目概况按部署、配置同步、监控、恢复和性能测试展开，术语表按需展开。既有技术证据与发布 tag 不变。
+[项目概况与术语说明](plain-language-guide.md)、README 顶部和 Release 正文提供中文阅读入口。个人主页采用 GitHub 原生文字排版，列出具体操作记录；项目概况按部署、配置同步、监控、恢复和性能测试展开，术语表按需展开。项目定位统一为基于 AWS Retail Store Sample App 的三节点 Kubernetes 可靠性工程实验室；环境约束在相应技术记录中说明。既有技术证据与发布 tag 不变。
 
 ## 怎样使用这些材料
 
