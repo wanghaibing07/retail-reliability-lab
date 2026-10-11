@@ -56,7 +56,7 @@ max_concurrent_unpacks = 1
 
 - 地址：`https://192.168.88.3:5000`；仅监听实验网节点地址，使用内部 TLS 证书，containerd 配置了 CA，未使用 `skip_verify`。
 - 命名空间：`retail-registry`；registry Pod 使用 `hostNetwork` 固定在 master，避免依赖业务 CNI 才能完成节点级镜像拉取。
-- 存储：`local-path-retain`、20Gi PVC，固定在 master；这是学习集群的单副本方案，不宣称高可用。
+- 存储：`local-path-retain`、20Gi PVC，固定在 master；该 Registry 使用单副本和节点本地存储，不提供高可用保障。
 - 内容：项目 10 个镜像、Kubernetes control-plane/kube-proxy/pause、Flannel、local-path-provisioner、registry 引导镜像均已预置；以 amd64 内容和 digest 验收。
 - containerd：三个节点的 `/etc/containerd/certs.d/docker.io/hosts.toml` 与 `_default/hosts.toml` 均指向内部 registry；原先指向 `docker.m.daocloud.io`、`docker.1panel.live` 的配置已移出 active 目录，不能再作为隐式外部依赖。
 
