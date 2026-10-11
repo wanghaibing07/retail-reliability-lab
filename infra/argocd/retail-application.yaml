@@ -15,6 +15,16 @@ spec:
     server: https://kubernetes.default.svc
     namespace: retail
 
+  # Credential values are provisioned outside Git and backed up privately.
+  # The exception applies only to this Secret's data.
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      namespace: retail
+      name: orders-rabbitmq
+      jsonPointers:
+        - /data
+
   syncPolicy:
     automated:
       enabled: true
@@ -23,3 +33,4 @@ spec:
       allowEmpty: false
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
