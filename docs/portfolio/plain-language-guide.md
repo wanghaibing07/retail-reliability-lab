@@ -1,4 +1,4 @@
-# Retail Reliability Lab 项目概况
+# Retail Reliability Lab：项目概况与术语
 
 基于 AWS Retail Store Sample App v1.6.2 搭建的三节点 Kubernetes 可靠性工程实验室，围绕部署交付、监控告警、数据恢复、发布安全和容量测试开展验证。
 
@@ -78,4 +78,4 @@ Prometheus 采集指标，Blackbox 从外部访问 UI，Alertmanager 发送通�
 
 ## 其他记录
 
-[架构图](architecture.md) · [各阶段的详细故事](incident-stories.md) · [结果和限制](claim-boundaries.md)
+[架构与组件依赖](architecture.md) · [五个工程案例](incident-stories.md) · [性能实验与结果](../performance/stage7-closeout.md)

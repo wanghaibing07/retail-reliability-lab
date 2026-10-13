@@ -1,12 +1,12 @@
-# 项目架构与面试讲解
+# 项目架构与技术证据
 
 > 中文阅读入口：[先用中文看懂项目与术语](plain-language-guide.md)。工具名称、命令和正式状态字段保留原文，便于核对证据。
 
 基于 AWS Retail Store Sample App v1.6.2 搭建的三节点 Kubernetes 可靠性工程实验室。业务应用采用上游样例；项目包含自动化部署、CI、GitOps、监控告警、数据恢复、受控发布故障与容量验证。已记录的 UI 异步调用修复包含在 Stage 7 测试基线中。
 
-本文依据 `stage7-v0.8`（`0fa9720338d553ab9cd815e7cc79ebea42f178e2`）的 Git 配置和封板证据绘制。图中展示设计关系与已记录的实验路径，不代表实验室此刻在线或健康；Stage 8 无需启动 VM。
+本文依据 `stage7-v0.8`（`0fa9720338d553ab9cd815e7cc79ebea42f178e2`）的 Git 配置和实验记录整理。图中区分设计关系与实际验证路径，不能作为实验室当前在线状态的证明。
 
-求职材料：[简历项目条目](resume-bullets.md) · [60 秒／3 分钟／10 分钟讲解](interview-guide.md) · [五个工程与排障故事](incident-stories.md)。
+相关技术案例：[五个工程与排障案例](incident-stories.md) · [GitOps 记录](../gitops/stage3-gitops.md) · [容量分析](../performance/stage7-closeout.md)。
 
 ## 一张图讲清主线
 
@@ -35,10 +35,6 @@ flowchart TD
 
 备份与隔离恢复路径见下图，容量测试与当前服务状态不混为一谈。主图省略内部镜像 Registry、存储配置与服务细节；这些省略不表示它们不存在。
 
-### 60 秒讲解
-
-> 我基于 AWS Retail Store Sample App 搭建了三节点 Kubernetes 可靠性工程实验室，主要负责自动化部署、GitOps、监控告警、数据恢复、发布故障与容量验证。变更先经过 PR 和 CI，再由 Argo CD 从 main 同步到集群；监控同时看入口探测、应用指标、对象状态和容器资源。我实际验证了告警触发与恢复邮件、Orders PostgreSQL 隔离恢复，以及 readiness 发布故障后的 Git revert 恢复。容量实验确认只读浏览负载在 30 RPS 下健康运行 300 秒，45 RPS 出现可重复的阶段性退化，但最大容量和唯一瓶颈没有确定。
-
 ## 业务服务与数据依赖
 
 以下关系来自上游清单的 ConfigMap，不是把所有服务画成一条串行调用链。UI 分别访问四个业务服务，Checkout 还调用 Orders。
@@ -57,7 +53,7 @@ flowchart TD
   orders --> rabbit["RabbitMQ"]
 ```
 
-| 关系 | Git 中的依据 | 面试时应说明 |
+| 关系 | Git 中的依据 | 工程含义 |
 | --- | --- | --- |
 | UI → 四个业务服务 | [上游清单的 UI ConfigMap](../../infra/vendor/retail-v1.6.2.yaml) | 服务通过各自 Service 地址访问，不依赖固定 Pod IP |
 | Catalog / Carts / Checkout / Orders → 后端 | [上游清单](../../infra/vendor/retail-v1.6.2.yaml) | 数据依赖不同，不能把 PostgreSQL 的恢复能力扩展到全部服务 |
@@ -115,9 +111,9 @@ Artillery 使用独立 `performance` 命名空间，通过 nodeSelector 和 tole
 - 30 RPS / 300s 已证明健康；45 RPS 可重复出现阶段性退化并在后段恢复；39 RPS 未取得有效资格结论。精确拐点和最大容量未确定。
 - 证据不足以锁定唯一瓶颈，S7-F 未新增被测系统优化。[公开证据索引](../../evidence/stage7/README.md)包含汇总结论与哈希；完整原始日志保留在原执行工作区，未全部托管在 GitHub。
 
-## 从图进入证据
+## 按技术主题查找证据
 
-| 面试主题 | 首选入口 |
+| 技术主题 | 首选入口 |
 | --- | --- |
 | CI 与 GitOps、自愈、Prune 防护 | [CI workflow](../../.github/workflows/ci.yml)、[Retail Application](../../infra/argocd/retail-application.yaml)、[Stage 3](../gitops/stage3-gitops.md) |
 | 告警实际触发与恢复 | [Stage 4](../observability/stage4-closeout.md) |
@@ -125,4 +121,4 @@ Artillery 使用独立 `performance` 命名空间，通过 nodeSelector 和 tole
 | readiness 发布故障与 Git 恢复 | [Stage 6](../releases/stage6-closeout.md) |
 | 容量实验资格、退化与不调参决策 | [Stage 7](../performance/stage7-closeout.md)、[证据索引](../../evidence/stage7/README.md) |
 
-Stage 0～7 已封板；Stage 8 只整理展示与表达。监控非高可用、节点本地存储无复制、受控发布实验不是生产零停机认证；图中也不增加未实施的服务网格、自动扩容或自动回滚组件。
+以上为已记录的实验能力：监控采用非高可用部署，节点本地存储无跨节点复制；受控发布验证只覆盖设定的 readiness 故障，不包含服务网格、自动扩容或自动回滚。
