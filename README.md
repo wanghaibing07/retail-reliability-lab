@@ -1,482 +1,92 @@
 # Retail Reliability Lab
 
-基于 **AWS Retail Store Sample App v1.6.2** 搭建的三节点 **Kubernetes 可靠性工程实验室**。项目覆盖自动化部署、GitOps、监控告警、订单数据恢复、发布故障恢复和容量验证；业务应用采用上游样例，我负责部署与监控配置、自动化脚本、故障排查和验证记录。
+基于 [AWS Retail Store Sample App v1.6.2](https://github.com/aws-containers/retail-store-sample-app) 构建的**三节点 Kubernetes 可靠性工程实验室**。围绕一套有状态、多服务的电商样例，完成从部署、持续交付、监控告警到数据恢复、故障发布和容量分析的工程实践。
 
-## 项目概况
+业务程序采用 AWS 开源样例；我负责 Kubernetes 部署和配置、自动化脚本、GitOps/CI、监控告警、故障演练及实测证据整理。
 
-项目从镜像拉取异常排查开始，随后整理了部署和检查脚本，接入 GitHub Actions、Argo CD 与监控，再做订单数据库恢复、发布失败和性能测试。各阶段的配置、操作步骤和结果保存在仓库中。
+## 核心成果
 
-几项已经完成的验证：
+| 方向 | 做了什么 | 实测结果 |
+|---|---|---|
+| **自动化部署** | 将镜像准备、部署、分层验证和清理拆成脚本 | 两轮重建分别在 **4m29s**、**3m47s** 完成，均无人工干预，业务 HTTP 200 |
+| **CI / GitOps** | 用 GitHub Actions 检查 Shell 与 Kubernetes 清单；Argo CD 自动同步、纠偏 | 手动将 UI 从两个副本改成一个后，Argo CD 恢复为 Git 中的两个副本 |
+| **监控告警** | 接入 Prometheus、Blackbox、kube-state-metrics、Alertmanager | 通过受控探测判据，验证指标变化、规则触发、告警邮件及恢复通知的完整链路 |
+| **备份恢复** | 为 Orders PostgreSQL 建立备份、隔离恢复和持久卷迁移流程 | 恢复数据可由应用读取；重建数据库 Pod 后，迁移前后订单均保留 |
+| **发布保护** | 结合 readiness、滚动更新策略、发布停滞告警和 Git revert | 错误的新 UI Pod 无法接流量，旧实例继续提供服务；撤销变更后恢复 |
+| **容量分析** | 使用 Artillery 固定浏览负载，结合请求、延迟、资源指标分析 | **30 RPS 持续 300 秒健康**；45 RPS 多轮出现阶段性退化，形成有边界的容量判断 |
 
-| 记录 | 主要结果 |
-| --- | --- |
-| [自动部署与配置同步](docs/gitops/stage3-gitops.md) | 修改先自动检查再部署；手工把 UI 改为一个副本后，Argo CD 恢复为 Git 中的两个 |
-| [告警通知](docs/observability/stage4-metric-driven-alert-drill.md) | 临时改变探测成功判据，实际收到触发和恢复邮件；演练期间业务入口仍返回 200 |
-| [订单数据库恢复](docs/backup/stage5-closeout.md) | 隔离恢复后应用能读回订单；迁移至持久存储并重建 Pod 后，新旧订单仍在 |
-| [发布失败演练](docs/releases/stage6-closeout.md) | 新 UI 实例无法就绪时，旧实例继续服务；撤销 Git 配置后恢复 |
-| [性能测试](docs/performance/stage7-closeout.md) | 只读浏览负载下，30 RPS 持续 300 秒已验证健康；45 RPS 多轮阶段性退化，后段恢复，最大容量尚未确定 |
+[查看完整架构与服务依赖](docs/portfolio/architecture.md)
 
-[项目概况与术语说明](docs/portfolio/plain-language-guide.md)按实际过程介绍这些记录；[架构图](docs/portfolio/architecture.md)说明服务之间的关系。
-
-## 当前进度
-
-| 阶段 | 内容 | 状态 |
-| --- | --- | --- |
-| Stage 0 | 业务基线与第一次故障排查 | ✅ 完成 |
-| Stage 1 | 可重复部署 | ✅ 完成 |
-| Stage 2 | 自动检查与质量门禁 | ✅ 完成 |
-| Stage 3 | Git 驱动部署与自动纠偏 | ✅ 完成 |
-| Stage 4 | 监控与告警 | ✅ 完成 |
-| Stage 5 | 备份与恢复 | ✅ 完成 |
-| Stage 6 | 发布失败与恢复 | ✅ 完成 |
-| Stage 7 | 性能与容量验证 | ✅ 完成 |
-| Stage 8 | 作品集与面试材料 | ✅ 完成 |
-
-### 相关文档
-
-- [中文架构图与 60 秒项目讲解](docs/portfolio/architecture.md)
-- [3～5 条简历项目描述](docs/portfolio/resume-bullets.md)
-- [3 分钟 / 10 分钟讲解](docs/portfolio/interview-guide.md)
-- [五个工程与排障故事](docs/portfolio/incident-stories.md)
-- [项目面试题库：先回答，再看证据](docs/portfolio/interview-question-bank.md)
-- [统一声明边界：可以说什么、证据在哪里](docs/portfolio/claim-boundaries.md)
-- [stage7-v0.8 GitHub Release](https://github.com/wanghaibing07/retail-reliability-lab/releases/tag/stage7-v0.8)
-- [Stage 8 验收与材料使用顺序](docs/portfolio/stage8-closeout.md)
-- [Stage 7 封板报告](docs/performance/stage7-closeout.md)
-- [Stage 7 证据索引](evidence/stage7/README.md)
-- [Stage 6 发布恢复报告](docs/releases/stage6-closeout.md)
-- [Stage 5 数据恢复报告](docs/backup/stage5-closeout.md)
-- [Stage 4 监控验收报告](docs/observability/stage4-closeout.md)
-- [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
-
-
-## 各阶段实施与验证
-
-下方按阶段保留历史验证记录；Healthy、target 数量及组件范围描述的是对应阶段的观测，不代表实验室当前在线状态。对外表达统一参照 [声明边界](docs/portfolio/claim-boundaries.md)。
-
-### 1. Kubernetes 业务基线
-
-固定使用 AWS Retail Store Sample App `v1.6.2`，部署包含：
-
-- Cart
-- Catalog
-- Checkout
-- Orders
-- UI
-- MySQL
-- PostgreSQL
-- RabbitMQ
-- Redis
-- DynamoDB Local
-
-### 2. Incident #001：镜像拉取异常
-
-在当前 VMware/NAT 实验环境中，并发镜像拉取出现过超时和连接异常。
-
-完成了：
-
-- DNS、HTTPS、Registry 连通性排查
-- 单流与并发镜像拉取对比
-- containerd 行为分析
-- 镜像串行预拉取
-- 故障恢复验证
-
-最终将镜像获取从业务部署关键路径中拆离。
-
-### 3. 可重复部署
-
-实现以下脚本：
+## 工程设计
 
 ```text
-scripts/
-├── prepull-images.sh
-├── deploy.sh
-├── verify.sh
-└── destroy.sh
+Git / Pull Request
+       │
+       ▼
+GitHub Actions（ShellCheck / K8s 清单检查）
+       │
+       ▼
+main → Argo CD → Kubernetes Retail 业务
+                     │
+              ┌──────┼──────────┐
+              ▼      ▼          ▼
+           探测/指标 数据库     发布状态
+              │      │          │
+              ▼      ▼          ▼
+        告警与通知  备份恢复   Git revert
 ```
 
-部署流程：
-
-```text
-Pre-pull Images
-      ↓
-Create Namespace
-      ↓
-Apply Manifest
-      ↓
-Workload Verification
-      ↓
-Service Endpoint Verification
-      ↓
-Business HTTP Verification
-```
-
-完成两次完整重建：
-
-```text
-destroy
-   ↓
-deploy
-   ↓
-verify
-```
-
-验证结果：
-
-| Test | Result | Duration | Manual Intervention |
-| --- | --- | ---: | ---: |
-| Rebuild #1 | PASS | 4m29.672s | 0 |
-| Rebuild #2 | PASS | 3m47.237s | 0 |
-
-两次测试最终业务 HTTP 均返回 `200`。
-
-### 4. 分层健康验证
-
-`verify.sh` 不只检查 Pod 是否运行，而是进行三层验证：
-
-```text
-Workload Ready
-      ↓
-Service Ready Endpoint
-      ↓
-Business HTTP 200
-```
-
-核心原则：
-
-```text
-Pod Running
-≠ Pod Ready
-≠ Service Available
-≠ Business Healthy
-```
-
-### 5. GitHub Actions CI
-
-当前 CI 在 Push 和 Pull Request 时自动执行：
-
-- Bash syntax check
-- ShellCheck
-- Kubernetes Manifest Schema Validation
-- 禁止使用 `latest` 镜像标签
-
-CI 曾真实发现 `SC2029` 问题，并通过：
-
-```text
-CI Failure
-    ↓
-fix/ci-shellcheck
-    ↓
-Pull Request
-    ↓
-CI Validation
-    ↓
-Merge into main
-```
-
-完成修复。
-
-当前 `main` 分支 CI 已验证通过。
-
-## 项目结构
-
-```text
-retail-reliability-lab/
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-├── docs/
-│   ├── incidents/
-│   ├── runbooks/
-│   ├── decisions/
-│   └── gitops/
-├── evidence/
-├── infra/
-│   ├── vendor/
-│   ├── apps/
-│   │   └── retail/
-│   └── argocd/
-├── scripts/
-│   ├── prepull-images.sh
-│   ├── deploy.sh
-│   ├── verify.sh
-│   ├── backup-orders.sh
-│   ├── restore-orders.sh
-│   └── destroy.sh
-└── README.md
-```
-
-## Stage 3：Argo CD / GitOps
-
-Stage 3 已验证以下 GitOps 交付流程：
-
-- `infra/apps/retail` 是 Retail 唯一 desired-state 入口
-- CI、Argo CD、`deploy.sh`、`prepull-images.sh` 统一使用该入口
-- Argo CD 平台配置已通过 Git/Kustomize 声明化管理
-- Resource Tracking 显式配置为 annotation
-- GitHub `main` 已启用 branch protection 和 required CI
-- Manual Sync 已验证
-- Auto Sync 已验证
-- Self Heal 已验证
-- Auto Prune 已通过一次性 ConfigMap 实验验证
-- MySQL、PostgreSQL、RabbitMQ StatefulSet 使用 `Prune=confirm`
-- `destroy.sh` 已具备 GitOps-aware、dry-run 和 fail-closed 防护
-- `verify.sh` 从 Git expected state 出发验证 workload、Service、EndpointSlice 和 HTTP
-
-当前自动同步策略：
-
-```yaml
-automated:
-  enabled: true
-  prune: true
-  selfHeal: true
-  allowEmpty: false
-```
-
-Stage 3 最终验证确认：
-
-```text
-Git main
-→ protected PR / required CI
-→ Argo reconciliation
-→ Synced / Healthy
-→ workload ready
-→ Service ready endpoints
-→ business HTTP 200
-```
-
-同时确认：
-
-- Auto Prune probe 已删除
-- 3 个 StatefulSet 保持 `Prune=confirm`
-- Argo CD platform 与 Git desired state 无 drift
-- Incident #003 的 retry mitigation 已声明化
-
-Incident #003 在 Kubernetes 1.36.4 重建后再次复现并完成更深层网络排查。
-当前证据将故障边界定位为不稳定的 GitHub 直连外部路径，无法继续证明到唯一上游组件。
-Retail repository 已通过 Argo CD repository-specific proxy 获得稳定访问；该方案作为实验室环境 mitigation，不宣称修复了原始直连路径。
-
-详细记录：
-
-- [Stage 3 GitOps](docs/gitops/stage3-gitops.md)
-- [Incidents](docs/incidents/)
-- [Runbooks](docs/runbooks/)
-- [Decisions](docs/decisions/)
-
-## 当前实验室基线
-
-2026-09-23 完成一次完整 Kubernetes 重建恢复验证：
-
-```text
-Kubernetes 1.36.4
-containerd 2.3.4
-3/3 Nodes Ready
-Argo CD v3.5.2
-Retail Synced / Healthy
-verify.sh PASS
-business HTTP 200
-```
-
-这次验证从新的 control plane 开始，依次恢复网络、Registry、Storage、Argo CD 和 Retail GitOps desired state。
-
-详细决策记录：
-
-* [Kubernetes 1.36.4 Rebuild](docs/decisions/002-kubernetes-136-rebuild.md)
-
-## Stage 4：可观测性（已完成）
-
-Stage 4 已完成以下监控与告警验证：
-
-- Prometheus v3.13.3 持久化到 `local-path-retain` PVC，48h / 3GB retention
-- Blackbox Exporter 跨节点探测 Retail UI NodePort
-- Alertmanager 已真实验证 firing 与 resolved 邮件
-- kube-state-metrics 采集 Node、Pod、Deployment、StatefulSet 对象状态
-- Stage 4 封板时 Prometheus 监控 8 个 target；Stage 7 另扩展了应用与容器指标
-- 4 条可行动告警：Retail UI、监控/GitOps target、Node Ready、Argo Application 状态
-- 告警规则具备 promtool 语法检查与时序行为测试
-- 保存四组诊断 PromQL：业务、GitOps、Node/Workload、监控自身
-- Prometheus PVC 已验证跨 Pod 替换保留历史样本
-- Stage 4 最终快照：Retail / observability 均为 Synced / Healthy，8/8 targets up，4/4 alert rules health=ok / inactive
-
-自然观察期间真实捕获一次 repo-server GitHub `info/refs` EOF：
-Retail 短暂进入 `Sync=Unknown`，`ArgoApplicationUnhealthy` 进入 pending，
-随后仓库访问恢复且 Application 自动回到 Synced / Healthy。
-该异常未持续越过 5 分钟 firing 阈值。
-
-S4-E 的墙钟观察窗口超过 24h，但 Prometheus 在该窗口内重启过两次并存在历史采样空窗，
-因此项目**不声称连续 24h 无故障、99.9% 可用性或完整 SLO 达标**。
-这作为已知观测限制保留，而不是用缺失样本推断系统健康。
-
-Stage 4 仍明确保持以下边界：
-
-- Prometheus / Alertmanager 均非高可用部署
-- local-path-retain 不是跨节点复制存储
-- 集群内监控无法覆盖整个实验室完全停机
-- Retail UI HTTP 200 只验证首页入口，不代表完整交易链路
-- Stage 4 未部署 node-exporter；后续历史采样与 Git 中的可重复部署范围需分别核对，不宣称节点指标连续、无空窗
-- GitHub repo-server 外部访问仍存在间歇抖动历史
-
-完整封板证据：
-
-- [Stage 4 Closeout](docs/observability/stage4-closeout.md)
-- [Prometheus 持久化](docs/observability/stage4-prometheus-persistence.md)
-- [kube-state-metrics](docs/observability/stage4-kube-state-metrics.md)
-- [可行动告警](docs/observability/stage4-actionable-alerts.md)
-- [诊断 PromQL](docs/observability/stage4-diagnostic-queries.md)
-- [邮件通知](docs/observability/stage4-email-notifications.md)
-- [指标驱动告警演练](docs/observability/stage4-metric-driven-alert-drill.md)
-
-Stage 4 已封板，后续恢复能力由 Stage 5 验证。
-
-
-## Stage 5：Backup / Restore（已完成）
-
-Stage 5 聚焦 Orders PostgreSQL，完成从临时 `emptyDir` 到 retained PVC 的备份、恢复与持久存储迁移：
-
-- 使用 `pg_dump -Fc` 生成 PostgreSQL 逻辑备份
-- 备份先写 `.partial`，通过非空、`pg_restore --list`、SHA256 后才发布正式归档
-- 备份副本离开原数据库 VM：`k8s-worker1 → k8s-master`
-- 在 `k8s-worker2` 隔离 PostgreSQL 中真实执行 `pg_restore`
-- 数据库层与 Orders 1.6.2 应用层均验证恢复 marker
-- 在维护窗口冻结 Checkout / Orders 写入后创建 final backup
-- 生产 `orders-postgresql` 从 `emptyDir` 迁移到 `orders-postgresql-data`
-- PVC：4Gi / RWO / `local-path-retain` / PV reclaimPolicy=Retain
-- final backup 恢复到生产 PVC 后，由正式 StatefulSet 接管
-- 迁移前订单与迁移后新订单均通过 PostgreSQL 和 Orders API 验证
-- 主动删除并重建 `orders-postgresql-0`，两个订单均保留
-
-关键实测：
-
-```text
-isolated restore -> application validation : 81.285s
-production PVC pg_restore                 : 0.365s
-final backup                              : 6s
-```
-
-本次受控实验中未观察到已确认 Orders 记录丢失。
-
-Stage 5 只证明：
-
-> 已验证 Orders PostgreSQL 数据库的备份、持久化和隔离恢复能力。
-
-不宣称：
-
-- 整个 Retail 的分布式一致性灾备
-- worker2 节点丢失后的跨节点存储自动故障转移
-- 异地 / off-site backup
-- 持续备份或保证 RPO=0
-- 保证生产 RTO
-
-完整记录：
-
-- [Stage 5 Closeout](docs/backup/stage5-closeout.md)
-- [Orders PostgreSQL Backup](docs/backup/orders-postgresql.md)
-- [Orders PostgreSQL Restore Runbook](docs/runbooks/orders-postgresql-restore.md)
-- [Orders PostgreSQL PVC Migration Runbook](docs/runbooks/orders-postgresql-pvc-migration.md)
-- [Stage 5 Evidence](docs/evidence/stage5/)
-
-下一阶段：Stage 6 Release Failure & Recovery。
-
-## Stage 6：Release Failure & Recovery（已完成）
-
-Stage 6 已完成一次受控 UI 发布失败与 GitOps 恢复验证。
-
-长期保留的 release safety：
-
-- UI `replicas=2`
-- `progressDeadlineSeconds=120`
-- `maxUnavailable=0`
-- `maxSurge=1`
-- `KubernetesDeploymentRolloutStalled` 发布停滞告警
-
-受控实验故意将 UI readiness path 从：
-
-```text
-/actuator/health/readiness
-```
-
-改为不存在的路径，使一个通过静态 CI 的合法 Kubernetes 变更在运行时产生真实 rollout failure。
-
-实测链路：
-
-```text
-PR / CI PASS
-      ↓
-Git merge
-      ↓
-Argo CD reconciliation
-      ↓
-new UI Pod Running / NotReady
-      ↓
-bad endpoint ready=false
-      ↓
-old 2 healthy replicas continue serving
-      ↓
-ProgressDeadlineExceeded
-      ↓
-KubernetesDeploymentRolloutStalled firing
-      ↓
-Git revert PR / CI PASS
-      ↓
-Argo CD reconciliation
-      ↓
-UI Healthy
-      ↓
-alert cleared
-      ↓
-verify.sh PASS
-```
-
-关键观测：
-
-- 坏版本：`ba058deadec602ae0392ab8a42cb2c72fa13061d`
-- 恢复版本：`9cae7211894947f6a780fcac9678121255e675a0`
-- Argo 开始同步坏版本后约 `2m02s` 观察到 `ProgressDeadlineExceeded`
-- 失败期间旧 UI replicas 保持 Ready
-- 采集到的用户入口请求持续返回 HTTP 200
-- recovery merge 后 `41s` 观察到 Argo 恢复 Healthy
-- 最终 `verify.sh` PASS
-
-正式 recovery 没有使用 `kubectl rollout undo`、live patch 或手工修改线上对象，而是：
-
-```text
-bad Git merge
-→ git revert
-→ recovery PR
-→ CI
-→ merge
-→ Argo CD reconciliation
-```
-
-因此 Stage 6 验证的是：
-
-> 在当前 Kubernetes + Argo CD GitOps 环境中，一次受控 UI 发布失败能够被检测、限制影响范围，并通过可审计的 Git desired-state 恢复。
-
-本阶段不宣称：
-
-- 已实现自动 rollback
-- 已实现 Canary / Blue-Green
-- 所有业务语义错误都能被 readiness 检测
-- 已证明生产零停机
-- 所有 Retail 服务都具备相同 release safety
-
-完整记录：
-
-- [Stage 6 Closeout](docs/releases/stage6-closeout.md)
-- [Release Failure Recovery Runbook](docs/runbooks/release-failure-recovery.md)
-- [Stage 6 Evidence](docs/evidence/stage6/readiness-failure-001/)
-
-## Stage 7 Performance / Capacity
-
-容量实验按环境限制封板：30 RPS /300s 已验证健康；45RPS 可重复退化；39RPS 未有效资格确认。精确拐点和硬容量上限未确定。S7-F 无充分因果证据，因此不新增SUT优化。
-
-- [Stage 7 封板报告](docs/performance/stage7-closeout.md)
-- [Stage 7 证据索引](evidence/stage7/README.md)
-
-文档与证据已收齐到上述索引；最终验收以 [PR #57](https://github.com/wanghaibing07/retail-reliability-lab/pull/57) 的实际合并提交、CI 和 `stage7-v0.8` annotated tag 为准。
-
-## 项目边界
-
-三节点共享物理宿主，Prometheus / Alertmanager 非高可用部署，节点本地数据卷不提供跨节点复制。恢复验证覆盖 Orders PostgreSQL，容量结论限于固定只读浏览负载。
-
-具体环境与结果范围见 [架构说明](docs/portfolio/architecture.md) 和 [声明边界](docs/portfolio/claim-boundaries.md)。
+**为什么这样设计？** 将“代码检查通过”与“运行中业务健康”分开验证。CI 负责尽早发现配置和脚本问题；Argo CD 让变更和运行状态保持一致；监控与 HTTP 验证负责发现服务真实异常；备份与恢复流程用实际订单数据检验结果。
+
+## 重点案例
+
+### 1. GitOps 配置自愈与真实排障
+
+将 Retail 应用配置纳入 Git 管理，实现 Argo CD 自动同步、自愈及受控 Prune 演练。曾遇到 Argo CD repo-server 访问 GitHub 间歇超时；经过网络链路排查，通过仓库级代理与重试缓解，使实验环境的仓库访问恢复稳定。
+
+[GitOps 记录](docs/gitops/stage3-gitops.md) · [Incident #003](docs/incidents/003-argocd-repo-server-github-timeout/README.md)
+
+### 2. 让告警真正跑通，而不只是发测试邮件
+
+通过改变 Blackbox 对 HTTP 状态码的接受条件，让正常返回 200 的页面触发探测失败。Prometheus 规则进入 firing、Alertmanager 发出邮件；恢复条件后又收到 resolved 通知。这个演练证明了**探测 → 指标 → 规则 → 通知 → 恢复**的实际链路。
+
+[告警演练](docs/observability/stage4-metric-driven-alert-drill.md) · [监控配置](infra/observability/prometheus/)
+
+### 3. 从备份文件走到实际订单恢复
+
+对 Orders PostgreSQL 执行逻辑备份，先在隔离环境验证恢复与应用读数，再迁移到带 Retain 策略的 PVC。恢复后重新创建数据库 Pod，验证旧订单和新订单仍可读取。
+
+[数据恢复证据](docs/backup/stage5-closeout.md) · [恢复脚本](scripts/restore-orders.sh)
+
+### 4. 一次受控的失败发布与 Git 恢复
+
+故意修改 UI readiness 路径，使通过静态检查的新版本在运行时无法就绪。坏实例未进入可用后端，已有两个健康副本保持服务；发布停滞触发告警。通过 Git revert 和 Argo CD 同步恢复业务，最终验证通过。
+
+[发布失败与恢复](docs/releases/stage6-closeout.md) · [故障证据](docs/evidence/stage6/readiness-failure-001/)
+
+### 5. 用数据说明系统能力，也说明性能边界
+
+在指定浏览负载下，**30 RPS、300 秒的稳态测试通过**，稳态 p95 为 **26 ms**，全程 12,060 次 HTTP 请求均返回 200，未观察到超时。继续提高至 45 RPS 时，多轮观察到延迟突增、部分虚拟用户执行失败和后段恢复。
+
+这让我能够明确指出一个**已经验证健康的工作点**和一个**重复出现退化的负载水平**，而不是仅凭少数 200 响应宣称系统没有瓶颈。精确容量上限仍未测定。
+
+[容量实验与原始结论](docs/performance/stage7-closeout.md) · [实验索引](evidence/stage7/README.md)
+
+## 代码与证据在哪里
+
+| 目录 | 内容 |
+|---|---|
+| [infra/](infra/) | Kubernetes 应用、Argo CD、监控、Registry、部署资源 |
+| [scripts/](scripts/) | 镜像准备、部署检查、订单备份与恢复脚本 |
+| [.github/workflows/](.github/workflows/) | CI 静态检查及验证流程 |
+| [tests/](tests/) | Prometheus 告警测试与性能场景 |
+| [docs/incidents/](docs/incidents/) | 故障记录和排障过程 |
+| [docs/runbooks/](docs/runbooks/) | 部署与恢复操作说明 |
+| [evidence/](evidence/) | GitOps、容量等实验记录 |
+| [docs/portfolio/architecture.md](docs/portfolio/architecture.md) | 项目拓扑与证据入口 |
+
+历史工作按 Stage 0～8 组织，其中 Stage 8 是成果整理阶段；对应的技术记录保存在各目录。已有 [stage7-v0.8 Release](https://github.com/wanghaibing07/retail-reliability-lab/releases/tag/stage7-v0.8) 可用于回看封板版本。
+
+## 实验范围
+
+实验运行于共享物理宿主的三节点 Kubernetes 环境。上述结论来自对应的受控实验和历史验收，不代表集群此刻在线或生产环境高可用；节点本地存储不提供跨节点复制。容量结果针对固定的只读浏览场景，订单恢复验证针对 PostgreSQL，均有原始文档可以复核。
