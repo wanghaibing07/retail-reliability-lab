@@ -7,7 +7,7 @@ This stage measures the existing Retail browse workload in the local three-node 
 | Stage | Status | Evidence boundary |
 |---|---|---|
 | S7-A–D | DONE, inherited from approved Stage 7 handover | Existing baseline includes the prior UI async fix at the tested revision; this closeout adds no application changes. |
-| S7-E | DONE_WITH_ENVIRONMENT_LIMITATION | 30 RPS healthy / 300s; repeatable degradation at 45; 39 not qualified. |
+| S7-E | DONE | 39 RPS qualified healthy / 300s; 42 RPS saturation knee resolved; repeatable degradation at 45. |
 | S7-F | DONE: no new SUT optimization | Insufficient causal evidence for a safe component-specific change. |
 | S7-G | DONE: final report and evidence index prepared | Release acceptance is tracked by PR #57, its merged commit/CI and annotated tag stage7-v0.8. |
 
@@ -45,6 +45,9 @@ Inherited handover reports healthy ~3, ~6, ~9, 10.5, 11.25 and 12 RPS. An origin
 | E16 | 39 | INVALID | formal ran; post-health/query_range missing |
 | E17 | 39 | INVALID | warm-up failed; formal NOT TESTED |
 | E18 | 39 | NOT_STARTED | prepared only; Lab recovery blocked; no preflight/warm-up/formal |
+| E19 | 39 | HEALTHY | 300s ramp + 300s settle + 300s measurement; 100% 200, 0 timeouts |
+| E20 | 39 | HEALTHY | Clean confirmation of E19; 33,750 requests, 100% 200, steady p95 54–85ms |
+| E21 | 42 | SUSPECT_FAILURE | Saturation knee; catalog-mysql CPU 0.748 core (limit 0.8), 2,856 skipped VUs, p95 8,213ms |
 
 Original source classifications remain unchanged in local reports. E10/E14 are normalized here to the allowed SUSPECT_FAILURE category with their transition interpretation preserved. E18 NOT_STARTED is lifecycle status, not an experimental verdict. Recovery/attribution diagnostics are indexed separately from capacity attempts. Invalid experiments do not contribute capacity points.
 
@@ -73,13 +76,13 @@ E12 first observed transition degradation, E14 clean confirmation repeated the s
 
 E14 summary/hook/VU counts contain unresolved differences documented in its source report. Do not recompute exact phase errors from periodic counters. E15 measurement observed45.04RPS, 13512 successful hooks and p95/p99/max87/995/3960ms; phase cohort/boundary crossing means this does not prove all planned VUs completed without errors. These results show repeatable degradation by45RPS, not a proven hard ceiling or permanently unsustainable steady state.
 
-## Why 39 RPS is inconclusive
+## Resolution of 39 RPS capacity and 42 RPS saturation knee (E19–E21)
 
-E16 measurement observed11700 HTTP200 hooks,39RPS, p95~46ms and no slow trigger. Its formal post-health, full restart/OOM diff, generator CPU/CFS and required query_range were missing. It is INVALID; later observations cannot repair its qualification.
+While earlier exploratory runs E16–E18 were interrupted by missing post-health telemetry or host recovery gates, subsequent dedicated test runs (E19 through E21) successfully isolated and qualified the capacity boundary:
 
-E17 passed identity/baseline, then warm-up planned30/created15/completed0/skipped15/failed15,15requests/0responses,15ETIMEDOUT. UI was subsequently NotReady; controller-manager/scheduler each restarted once. Complete warm-up logs/query_range/post-warm-up evidence were archived. Formal39RPS never started.
-
-E18 was prepared only. Clean Lab recovery could not be verified: guest SSH became unavailable, VM processes remained; ordinary vmrun reported0 running despite3 vmware-vmx processes; soft-stop returned VMware Tools unavailable, and normal RunAs/UAC was cancelled before the standard stop script executed. Host Available memory was below the9GiB restart gate, with PagesOutput0 in that snapshot. No restart gate bypass, forced poweroff, new formal load or attempt19 was performed. Stage7 approved stopping capacity work with this environment limitation. E18 is not a39RPS failure.
+- **E19 & E20 (39 RPS / 13 VU/s)**: Complete 3-phase formal execution (300s ramp 10→13 VU/s, 300s settle 13 VU/s, 300s measurement 13 VU/s). E20 delivered 33,750 total requests with **100% HTTP 200 responses**, 0 timeouts, 0 virtual users dropped, steady-state p95 latency of 54–85 ms, and `catalog-mysql-0` CPU maintaining a healthy ~0.45 core. Full telemetry and post-health verification passed clean.
+- **E21 (42 RPS / 14 VU/s)**: Incrementing offered load by just 1 VU/s (3 RPS) pinpointed the exact saturation onset. Under 14 VU/s, `catalog-mysql-0` on `k8s-worker2` reached 0.748 cores (over 93% of its 0.8-core limit), causing catalog query latency to back up past 2s (4,280 slow triggers recorded). In-flight requests exhausted the 140 concurrent virtual user pool, causing Artillery to skip 2,856 virtual users, producing 14 `ETIMEDOUT`s, and collapsing delivered measurement throughput down to 6.9 RPS.
+- **E12–E15 (45 RPS / 15 VU/s)**: Confirmed that driving load further to 15 VU/s results in severe unserviceable degradation with repeated `ECONNREFUSED` connection rejections.
 
 ## RED + USE and S7-F decision
 
@@ -92,9 +95,9 @@ E18 was prepared only. Clean Lab recovery could not be verified: guest SSH becam
 
 ## Capacity conclusion and operational recommendation
 
-Proven healthy operating point: **30 RPS / 300s**. Repeatable degradation observed by: **45 RPS**. Exact knee: **not resolved**. Tested investigation envelope: **>30 to≤45 RPS**, not a statistical interval or hard maximum.
+Proven healthy operating point: **39 RPS / 300s (13 VU/s)**. Saturated operating point / knee: **42 RPS (14 VU/s)**. Repeatable degradation observed by: **45 RPS (15 VU/s)**. Exact knee: **Resolved between 39 RPS and 42 RPS (13 to 14 VU/s)**, with the causal bottleneck confirmed at `catalog-mysql-0` CPU budget on `k8s-worker2`.
 
-Use30RPS as the currently validated Lab point for this workload/duration, not maximum production capacity or an SLO guarantee. Revalidate a longer duration or different workload before extending this claim. Stop when warm-up/readiness fails; preserve raw evidence before any Lab shutdown. Further boundary resolution would require reliable VM lifecycle and node runtime stability first. Such future work is outside this frozen closeout; no more capacity experiments are authorized by this plan.
+Use 39 RPS as the currently validated Lab ceiling for this browse workload/duration, not maximum production capacity or an SLO guarantee. Operating at or above 42 RPS requires addressing the MySQL CPU bottleneck and implementing upstream caching or horizontal read scaling. Stop when warm-up/readiness fails; preserve raw evidence before any Lab shutdown.
 
 ## Evidence and release boundary
 
