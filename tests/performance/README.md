@@ -31,7 +31,20 @@ creating checkout/order data.
 Artillery arrivalRate is virtual-user arrivals per second, not HTTP RPS.
 
 Capacity reports must record actual HTTP request rate separately from
-arrivalRate.
+arrivalRate:
+
+$$\text{HTTP RPS} = \text{arrivalRate (VU/s)} \times 3$$
+
+## Capacity Envelope & Knee Summary
+
+| Load Point | VU/s | Target RPS | Result | Key Observation |
+|---|---|---|---|---|
+| Baseline | 10 | 30 | PASS | 100% 200 OK, p95 ~26ms, zero errors |
+| Capacity Ceiling | 13 | 39 | PASS | 33,750 requests, 100% 200 OK, p95 54–85ms, MySQL CPU ~0.45 core |
+| Saturation Knee | 14 | 42 | SATURATED | MySQL CPU 0.748 core (limit 0.8), 2,856 VUs skipped, p95 8,213ms |
+| Unserviceable | 15 | 45 | FAIL | Severe queue backup, ECONNREFUSED / ETIMEDOUT |
+
+- Primary Bottleneck: `catalog-mysql-0` on `k8s-worker2` reaches its 0.8-core CPU limit under 14 VU/s (42 RPS), causing query latency to back up into upstream UI connection pools.
 
 ## Runtime image supply
 
