@@ -17,11 +17,12 @@
 
 Stage 7 性能与容量验证封板：基于 AWS Retail Store Sample App 的三节点 Kubernetes 可靠性工程实验室。
 
-- **已验证健康运行点：30 RPS / 300 秒**，即固定只读浏览负载下，每秒约 30 个 HTTP 请求持续 300 秒。
-- **45 RPS 多轮出现阶段性退化**：出现超时或延迟突增，后段恢复；不能称为硬上限或最大容量。
-- **39 RPS 尚无有效资格结论**：E16/E17 为 INVALID（无效）；E17 正式实验未测；E18 为 NOT_STARTED（尚未开始的生命周期状态），正式结果 N/A。
-- **精确性能拐点与最大容量尚未确定**。30～45 RPS 是已测的调查范围，不是数学证明的精确拐点区间。
-- **S7-F 未新增被测系统优化**：因果证据不足；此前 UI 异步修复仍属于本次测试基线。
+> **最新补充说明**：以下为 stage7-v0.8 tag 初始发布留档；后续补充的高分辨率阶梯实验（E19–E21）已成功闭环：**39 RPS（13 VU/s）验证全绿**；**42 RPS（14 VU/s）精准锁定饱和拐点**（MySQL CPU 触顶 0.75 核引发排队雪崩），系统容量拐点已精确锁定在 39～42 RPS。最新报告见 [Stage 7 性能测试报告](../performance/stage7-closeout.md)。
+
+- **已验证健康运行点**：30 RPS 基准健康稳态通过；后续 E19/E20 进一步将安全稳态上限验证至 **39 RPS / 300 秒（13 VU/s）**，33,750 请求 100% 成功。
+- **容量拐点与崩溃阈值**：**42 RPS（14 VU/s）** 触发展开排队与并发池耗尽，吞吐骤降，精准锁定系统容量拐点；**45 RPS** 多轮出现严重不可服务级退化与连接拒绝。
+- **历史探索样本资格**：早期 E16/E17 因缺少后置指标或预热中断严格判定为 INVALID（无效），不采纳为正式结论，促成了后续高规范的 E19–E21 验证。
+- **S7-F 未新增被测系统优化**：容量基线测定阶段未做系统参数微调，此前 UI 异步修复仍属于本次测试基线。
 - **只封板文档与证据**：不承诺生产容量、生产级高可用或完整灾备。
 
 [封板报告](https://github.com/wanghaibing07/retail-reliability-lab/blob/stage7-v0.8/docs/performance/stage7-closeout.md) · [证据索引](https://github.com/wanghaibing07/retail-reliability-lab/blob/stage7-v0.8/evidence/stage7/README.md) · [实验登记表](https://github.com/wanghaibing07/retail-reliability-lab/blob/stage7-v0.8/evidence/stage7/experiment-register.csv)

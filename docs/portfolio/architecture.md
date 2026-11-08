@@ -108,8 +108,8 @@ Artillery 使用独立 `performance` 命名空间，通过 nodeSelector 和 tole
 - [Git smoke Job](../../tests/performance/k8s/browse-smoke-job.yaml)：CPU limit 为 500m，目标是 `http://ui.retail.svc.cluster.local:80`。
 - [Stage 7 正式实验](../performance/stage7-closeout.md)：generator CPU limit 为 1 core，依据归档的正式 Job 证据；不能把 smoke YAML 当作 E11～E15 的原样配置。
 - 只读浏览访问 `/home`、`/catalog` 和商品详情，每个虚拟用户配置三个请求；虚拟用户到达率不等于 HTTP RPS。
-- 30 RPS / 300s 已证明健康；45 RPS 可重复出现阶段性退化并在后段恢复；39 RPS 未取得有效资格结论。精确拐点和最大容量未确定。
-- 证据不足以锁定唯一瓶颈，S7-F 未新增被测系统优化。[公开证据索引](../../evidence/stage7/README.md)包含汇总结论与哈希；完整原始日志保留在原执行工作区，未全部托管在 GitHub。
+- 30 RPS 与 39 RPS（13 VU/s）已验证健康（39 RPS 下 33,750 请求 100% 成功，p95 54~85ms）；42 RPS（14 VU/s）精准复现容量拐点，后端 catalog-mysql CPU 触顶（0.748 / 0.8 核）引发并发池耗尽与雪崩；45 RPS 可重复出现严重退化与连接拒绝。容量拐点成功锁定在 39～42 RPS 区间。
+- 明确了底层 MySQL CPU 配额为容量第一瓶颈，为后续只读缓存或横向扩展提供依据；基线期内未新增系统调参优化。[公开证据索引](../../evidence/stage7/README.md)包含汇总结论与哈希；完整原始日志保留在原执行工作区，未全部托管在 GitHub。
 
 ## 按技术主题查找证据
 
